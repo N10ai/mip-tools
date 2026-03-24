@@ -98,58 +98,45 @@ let cargoIndex = 0;
 
 function createCargoItem(index) {
   const wrapper = document.createElement("div");
-  wrapper.className = "bg-white border border-[#e2d4c8] rounded-xl p-5";
+  wrapper.className = "bg-white border rounded-xl p-5";
   wrapper.dataset.index = index;
 
   wrapper.innerHTML = `
-    <div class="text-sm font-semibold text-[#0f6fa6] mb-4">Item ${index + 1}</div>
+    <div class="flex items-center gap-4 mb-4">
+      <div class="text-xl font-bold text-blue-700">Item ${index + 1}</div>
+      <input class="field cargo-commodity flex-1" placeholder="Commodity">
+      <select class="field cargo-type w-40">
+        <option>General</option>
+        <option>Fragile</option>
+        <option>Hazardous</option>
+      </select>
+    </div>
 
-    <!-- ROW 1 -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
-      
-      <div>
-        <label class="label">Commodity</label>
-        <input class="field cargo-commodity" placeholder="e.g. Electronics, Clothing">
+    <div class="grid grid-cols-12 gap-3 items-end">
+
+      <!-- QTY -->
+      <div class="col-span-1">
+        <label class="label">Qty</label>
+        <input type="number" class="field cargo-qty text-center" value="1">
       </div>
 
-      <div>
+      <!-- PACKAGING -->
+      <div class="col-span-2">
         <label class="label">Packaging</label>
         <select class="field cargo-packaging">
           <option>Pallet</option>
           <option>Box</option>
           <option>Crate</option>
-          <option>Drum</option>
-          <option>Bag</option>
         </select>
       </div>
 
-      <div>
-        <label class="label">Cargo Type</label>
-        <select class="field cargo-type">
-          <option>General</option>
-          <option>Fragile</option>
-          <option>Hazardous</option>
-          <option>Refrigerated</option>
-          <option>Oversized</option>
-        </select>
-      </div>
-
-      <div>
-        <label class="label">Qty</label>
-        <input type="number" class="field cargo-qty" value="1" min="1">
-      </div>
-
-    </div>
-
-    <!-- ROW 2 -->
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-4">
-
-      <div class="md:col-span-2 flex gap-2">
+      <!-- WEIGHT -->
+      <div class="col-span-3 flex gap-2 items-end">
         <div class="flex-1">
           <label class="label">Weight</label>
           <input type="number" class="field cargo-weight" value="10">
         </div>
-        <div class="w-24">
+        <div class="w-20">
           <label class="label">Unit</label>
           <select class="field cargo-weight-unit">
             <option value="kg">kg</option>
@@ -158,63 +145,65 @@ function createCargoItem(index) {
         </div>
       </div>
 
-      <div>
-        <label class="label">Length</label>
-        <input type="number" class="field cargo-length" value="40">
-      </div>
-
-      <div>
-        <label class="label">Width</label>
-        <input type="number" class="field cargo-width" value="30">
-      </div>
-
-      <div>
-        <label class="label">Height</label>
-        <input type="number" class="field cargo-height" value="20">
-      </div>
-
-    </div>
-
-    <!-- ROW 3 -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
-
-      <div class="w-32">
-        <label class="label">Dim Unit</label>
-        <select class="field cargo-dim-unit">
-          <option value="cm">cm</option>
-          <option value="inch">inch</option>
-        </select>
+      <!-- DIMENSIONS -->
+      <div class="col-span-5 flex gap-2 items-end">
+        <div>
+          <label class="label">L</label>
+          <input type="number" class="field cargo-length w-20" value="40">
+        </div>
+        <div class="pt-6">×</div>
+        <div>
+          <label class="label">W</label>
+          <input type="number" class="field cargo-width w-20" value="30">
+        </div>
+        <div class="pt-6">×</div>
+        <div>
+          <label class="label">H</label>
+          <input type="number" class="field cargo-height w-20" value="20">
+        </div>
+        <div>
+          <label class="label">Unit</label>
+          <select class="field cargo-dim-unit w-20">
+            <option value="cm">cm</option>
+            <option value="inch">inch</option>
+          </select>
+        </div>
       </div>
 
     </div>
 
     <!-- RESULTS -->
-    <div class="text-xs text-[#8a6247] cargo-volume">Volume: —</div>
-    <div class="text-xs text-[#8a6247] cargo-volumetric">Volumetric Weight: —</div>
-    <div class="text-xs text-[#8a6247] cargo-chargeable">Chargeable Weight: —</div>
+    <div class="mt-3 text-sm text-[#8a6247]">
+      <div class="cargo-volume">Volume: —</div>
+      <div class="cargo-volumetric">Volumetric: —</div>
+      <div class="cargo-chargeable">Chargeable: —</div>
+    </div>
 
-    <button type="button" class="mt-3 text-sm text-red-600 font-medium remove-cargo">
-      Remove
-    </button>
+    <div class="flex justify-end gap-3 mt-3 text-sm">
+      <button class="duplicate text-gray-600">Duplicate</button>
+      <button class="remove-cargo text-red-600">Remove</button>
+    </div>
   `;
+
+  attachUnitConversions(wrapper);
 
   wrapper.addEventListener("input", () => recalcAllCargo());
 
-  wrapper.querySelector(".remove-cargo").addEventListener("click", () => {
+  wrapper.querySelector(".remove-cargo").onclick = () => {
     wrapper.remove();
     recalcAllCargo();
-  });
+  };
 
   return wrapper;
 }
-
 function addCargoItem() {
   cargoItemsEl.appendChild(createCargoItem(cargoIndex));
   cargoIndex++;
   recalcAllCargo();
 }
 
-function recalcAllCargo() {
+function recalcAllCargo() 
+{
   let totalVolume = 0;
   let totalVolumetric = 0;
   let totalChargeable = 0;
@@ -245,6 +234,62 @@ function recalcAllCargo() {
   document.getElementById("totalVolume").textContent = totalVolume.toFixed(2);
   document.getElementById("totalChargeableWeight").textContent = totalChargeable.toFixed(2);
 }
+
+
+function attachUnitConversions(wrapper) {
+
+  const weightInput = wrapper.querySelector(".cargo-weight");
+  const weightUnit = wrapper.querySelector(".cargo-weight-unit");
+
+  const length = wrapper.querySelector(".cargo-length");
+  const width = wrapper.querySelector(".cargo-width");
+  const height = wrapper.querySelector(".cargo-height");
+  const dimUnit = wrapper.querySelector(".cargo-dim-unit");
+
+  // STORE PREVIOUS UNITS
+  weightUnit.dataset.prev = weightUnit.value;
+  dimUnit.dataset.prev = dimUnit.value;
+
+  // WEIGHT CONVERSION
+  weightUnit.addEventListener("change", () => {
+    const oldUnit = weightUnit.dataset.prev;
+    const newUnit = weightUnit.value;
+    let val = parseFloat(weightInput.value);
+
+    if (!isNaN(val)) {
+      if (oldUnit === "kg" && newUnit === "lbs") {
+        weightInput.value = (val * 2.20462).toFixed(2);
+      } else if (oldUnit === "lbs" && newUnit === "kg") {
+        weightInput.value = (val / 2.20462).toFixed(2);
+      }
+    }
+
+    weightUnit.dataset.prev = newUnit;
+    recalcAllCargo();
+  });
+
+  // DIMENSION CONVERSION
+  dimUnit.addEventListener("change", () => {
+    const oldUnit = dimUnit.dataset.prev;
+    const newUnit = dimUnit.value;
+
+    [length, width, height].forEach(input => {
+      let val = parseFloat(input.value);
+
+      if (!isNaN(val)) {
+        if (oldUnit === "cm" && newUnit === "inch") {
+          input.value = (val / 2.54).toFixed(2);
+        } else if (oldUnit === "inch" && newUnit === "cm") {
+          input.value = (val * 2.54).toFixed(2);
+        }
+      }
+    });
+
+    dimUnit.dataset.prev = newUnit;
+    recalcAllCargo();
+  });
+}
+
 
 // ==============================
 // UTILITIES
