@@ -95,21 +95,48 @@ function attachAutocomplete(inputId, nameId, countryId) {
 const cargoItemsEl = document.getElementById("cargoItems");
 const addCargoBtn = document.getElementById("addCargoBtn");
 let cargoIndex = 0;
-
 function createCargoItem(index) {
   const wrapper = document.createElement("div");
+  wrapper.className = "bg-white border border-[#e2d4c8] rounded-xl p-4";
   wrapper.dataset.index = index;
 
   wrapper.innerHTML = `
-    <input class="cargo-qty" type="number" value="1">
-    <input class="cargo-weight" type="number" value="10">
-    <input class="cargo-length" type="number" value="40">
-    <input class="cargo-width" type="number" value="30">
-    <input class="cargo-height" type="number" value="20">
-    <div class="cargo-volume"></div>
-    <div class="cargo-volumetric"></div>
-    <div class="cargo-chargeable"></div>
-    <button class="remove-cargo">Remove</button>
+    <div class="text-sm font-semibold text-[#0f6fa6] mb-4">Item ${index + 1}</div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+      <div>
+        <label class="label">Qty</label>
+        <input type="number" class="field cargo-qty" value="1" min="1">
+      </div>
+
+      <div>
+        <label class="label">Weight</label>
+        <input type="number" class="field cargo-weight" value="10">
+      </div>
+
+      <div>
+        <label class="label">Length</label>
+        <input type="number" class="field cargo-length" value="40">
+      </div>
+
+      <div>
+        <label class="label">Width</label>
+        <input type="number" class="field cargo-width" value="30">
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+      <div>
+        <label class="label">Height</label>
+        <input type="number" class="field cargo-height" value="20">
+      </div>
+    </div>
+
+    <div class="text-xs text-[#8a6247] cargo-volume">Volume: —</div>
+    <div class="text-xs text-[#8a6247] cargo-volumetric">Volumetric Weight: —</div>
+    <div class="text-xs text-[#8a6247] cargo-chargeable">Chargeable Weight: —</div>
+
+    <button type="button" class="mt-3 text-sm text-red-600 font-medium remove-cargo">Remove</button>
   `;
 
   wrapper.addEventListener("input", () => recalcAllCargo());
