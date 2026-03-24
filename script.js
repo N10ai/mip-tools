@@ -17,7 +17,7 @@ const state = {
 // DATA LOADING
 // ==============================
 
-fetch('assets/data/logistics-locations.json')
+fetch('mip-tools/logistics-locations.json')
   .then(res => res.json())
   .then(data => {
     logisticsLocations = data;
