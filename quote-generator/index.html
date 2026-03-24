@@ -13,25 +13,7 @@
 </head>
 
   
-  <script>
 
-let logisticsLocations = []
-fetch('assets/data/logistics-locations.json')
-.then(res => res.json())
-.then(data => {
-
-logisticsLocations = data
-
-console.log("Locations loaded:", logisticsLocations.length)
-
-})
-.catch(err => {
-
-console.error("Failed to load locations JSON", err)
-
-})
-
-</script>
   <script src="assets/js/script.js" defer></script>
   <body>
   <!-- Header -->
