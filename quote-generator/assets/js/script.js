@@ -96,20 +96,17 @@ const cargoItemsEl = document.getElementById("cargoItems");
 const addCargoBtn = document.getElementById("addCargoBtn");
 let cargoIndex = 0;
 
-function createCargoItem(index) console.log("NEW UI LOADED"); {
+function createCargoItem(index) {
   console.log("NEW UI LOADED");
+
   const wrapper = document.createElement("div");
   wrapper.className = "bg-white border rounded-xl p-5";
   wrapper.dataset.index = index;
 
   wrapper.innerHTML = `
-    
-    <!-- TOP ROW -->
     <div class="flex items-center gap-4 mb-4">
       <div class="text-xl font-bold text-blue-700 w-24">Item ${index + 1}</div>
-
       <input class="field cargo-commodity flex-1" placeholder="Commodity">
-
       <select class="field cargo-type w-48">
         <option>General</option>
         <option>Fragile</option>
@@ -117,19 +114,15 @@ function createCargoItem(index) console.log("NEW UI LOADED"); {
       </select>
     </div>
 
-    <!-- MAIN GRID -->
     <div class="flex gap-4 items-start">
 
-      <!-- QTY BLOCK -->
       <div class="flex flex-col items-center">
         <label class="text-sm text-gray-600 mb-1">Qty</label>
         <input type="number" class="field cargo-qty text-center w-16 h-16 text-lg" value="1">
       </div>
 
-      <!-- RIGHT SIDE -->
       <div class="flex-1">
 
-        <!-- ROW 1 -->
         <div class="flex gap-4 items-end mb-3">
 
           <div>
@@ -158,7 +151,6 @@ function createCargoItem(index) console.log("NEW UI LOADED"); {
 
         </div>
 
-        <!-- ROW 2 (DIMENSIONS) -->
         <div class="flex gap-2 items-end">
 
           <div>
@@ -193,14 +185,12 @@ function createCargoItem(index) console.log("NEW UI LOADED"); {
       </div>
     </div>
 
-    <!-- RESULTS -->
     <div class="mt-3 text-sm text-[#8a6247]">
       <div class="cargo-volume">Volume: —</div>
       <div class="cargo-volumetric">Volumetric: —</div>
       <div class="cargo-chargeable">Chargeable: —</div>
     </div>
 
-    <!-- ACTIONS -->
     <div class="flex justify-end gap-4 mt-3 text-sm">
       <button class="duplicate text-gray-600">Duplicate</button>
       <button class="remove-cargo text-red-600">Remove</button>
