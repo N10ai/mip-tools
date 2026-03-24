@@ -97,6 +97,7 @@ const addCargoBtn = document.getElementById("addCargoBtn");
 let cargoIndex = 0;
 
 function createCargoItem(index) {
+  console.log("NEW UI LOADED");
   const wrapper = document.createElement("div");
   wrapper.className = "bg-white border rounded-xl p-5";
   wrapper.dataset.index = index;
