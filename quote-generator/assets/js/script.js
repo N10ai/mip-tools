@@ -46,15 +46,6 @@ function searchLocations(query) {
       loc.city.toLowerCase().includes(query) ||
       loc.country.toLowerCase().includes(query)
     )
-    .sort((a, b) => {
-      const aStarts = a.code.toLowerCase().startsWith(query);
-      const bStarts = b.code.toLowerCase().startsWith(query);
-
-      if (aStarts && !bStarts) return -1;
-      if (!aStarts && bStarts) return 1;
-
-      return 0;
-    })
     .slice(0, 8);
 }
 
@@ -64,18 +55,6 @@ function attachAutocomplete(inputId, nameId, countryId) {
   const countryField = document.getElementById(countryId);
 
   const dropdown = document.createElement("div");
-
-  Object.assign(dropdown.style, {
-    position: "absolute",
-    background: "white",
-    border: "1px solid #ddd",
-    borderRadius: "8px",
-    zIndex: "999",
-    width: input.offsetWidth + "px",
-    maxHeight: "220px",
-    overflowY: "auto"
-  });
-
   dropdown.classList.add("hidden");
   input.parentElement.appendChild(dropdown);
 
@@ -88,17 +67,12 @@ function attachAutocomplete(inputId, nameId, countryId) {
     }
 
     const results = searchLocations(query);
-
     dropdown.innerHTML = "";
 
     results.forEach(loc => {
       const option = document.createElement("div");
 
-      option.style.padding = "8px 10px";
-      option.style.cursor = "pointer";
-      option.style.fontSize = "13px";
-
-      option.innerHTML = `<b>${loc.code}</b> — ${loc.name} (${loc.country})`;
+      option.innerHTML = `<b>${loc.code}</b> — ${loc.name}`;
 
       option.onclick = () => {
         input.value = loc.code;
@@ -112,58 +86,6 @@ function attachAutocomplete(inputId, nameId, countryId) {
 
     dropdown.classList.remove("hidden");
   });
-
-  document.addEventListener("click", (e) => {
-    if (!input.contains(e.target) && !dropdown.contains(e.target)) {
-      dropdown.classList.add("hidden");
-    }
-  });
-}
-
-// ==============================
-// UI STATE & TOGGLES
-// ==============================
-
-function setGroupActive(group, value) {
-  document.querySelectorAll(`[data-group="${group}"]`).forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.value === value);
-  });
-}
-
-function syncConditionalSections() {
-  const loadTypeWrap = document.getElementById("loadTypeWrap");
-  const containerTypeWrap = document.getElementById("containerTypeWrap");
-  const routeAirOceanSection = document.getElementById("routeAirOceanSection");
-  const routeGroundSection = document.getElementById("routeGroundSection");
-  const inlandAirOceanSection = document.getElementById("inlandAirOceanSection");
-  const tradeDirectionWrap = document.getElementById("tradeDirectionWrap");
-
-  if (state.transportMode === "ocean") {
-    loadTypeWrap.classList.remove("hidden");
-  } else {
-    loadTypeWrap.classList.add("hidden");
-    containerTypeWrap.classList.add("hidden");
-  }
-
-  if (state.transportMode === "ocean" && state.loadType === "fcl") {
-    containerTypeWrap.classList.remove("hidden");
-  } else {
-    containerTypeWrap.classList.add("hidden");
-  }
-
-  if (state.transportMode === "ground") {
-    routeAirOceanSection.classList.add("hidden");
-    routeGroundSection.classList.remove("hidden");
-    inlandAirOceanSection.classList.add("hidden");
-    document.getElementById("inlandSection").classList.add("hidden");
-    document.getElementById("includeInlandFreight").checked = false;
-    tradeDirectionWrap.classList.add("hidden");
-  } else {
-    routeAirOceanSection.classList.remove("hidden");
-    routeGroundSection.classList.add("hidden");
-    inlandAirOceanSection.classList.remove("hidden");
-    tradeDirectionWrap.classList.remove("hidden");
-  }
 }
 
 // ==============================
@@ -174,98 +96,117 @@ const cargoItemsEl = document.getElementById("cargoItems");
 const addCargoBtn = document.getElementById("addCargoBtn");
 let cargoIndex = 0;
 
-// (ALL YOUR EXISTING CARGO FUNCTIONS HERE — unchanged)
-// createCargoItem()
-// addCargoItem()
-// renumberCargoItems()
-// recalcCargo()
-// recalcAllCargo()
+function createCargoItem(index) {
+  const wrapper = document.createElement("div");
+  wrapper.dataset.index = index;
 
-// 👉 KEEP THEM EXACTLY AS YOU HAVE THEM
+  wrapper.innerHTML = `
+    <input class="cargo-qty" type="number" value="1">
+    <input class="cargo-weight" type="number" value="10">
+    <input class="cargo-length" type="number" value="40">
+    <input class="cargo-width" type="number" value="30">
+    <input class="cargo-height" type="number" value="20">
+    <div class="cargo-volume"></div>
+    <div class="cargo-volumetric"></div>
+    <div class="cargo-chargeable"></div>
+    <button class="remove-cargo">Remove</button>
+  `;
+
+  wrapper.addEventListener("input", () => recalcAllCargo());
+
+  wrapper.querySelector(".remove-cargo").addEventListener("click", () => {
+    wrapper.remove();
+    recalcAllCargo();
+  });
+
+  return wrapper;
+}
+
+function addCargoItem() {
+  cargoItemsEl.appendChild(createCargoItem(cargoIndex));
+  cargoIndex++;
+  recalcAllCargo();
+}
+
+function recalcAllCargo() {
+  let totalVolume = 0;
+  let totalVolumetric = 0;
+  let totalChargeable = 0;
+
+  cargoItemsEl.querySelectorAll("[data-index]").forEach(wrapper => {
+    const qty = Number(wrapper.querySelector(".cargo-qty").value) || 0;
+    const weight = Number(wrapper.querySelector(".cargo-weight").value) || 0;
+    const length = Number(wrapper.querySelector(".cargo-length").value) || 0;
+    const width = Number(wrapper.querySelector(".cargo-width").value) || 0;
+    const height = Number(wrapper.querySelector(".cargo-height").value) || 0;
+
+    const volume = (length * width * height) / 1000000;
+    const totalVol = volume * qty;
+
+    const volumetric = (length * width * height) / 6000 * qty;
+    const actual = weight * qty;
+    const chargeable = Math.max(volumetric, actual);
+
+    totalVolume += totalVol;
+    totalVolumetric += volumetric;
+    totalChargeable += chargeable;
+
+    wrapper.querySelector(".cargo-volume").textContent = `Volume: ${totalVol.toFixed(2)}`;
+    wrapper.querySelector(".cargo-volumetric").textContent = `Volumetric: ${volumetric.toFixed(2)}`;
+    wrapper.querySelector(".cargo-chargeable").textContent = `Chargeable: ${chargeable.toFixed(2)}`;
+  });
+
+  document.getElementById("totalVolume").textContent = totalVolume.toFixed(2);
+  document.getElementById("totalChargeableWeight").textContent = totalChargeable.toFixed(2);
+}
 
 // ==============================
 // UTILITIES
 // ==============================
 
 function generateQuoteNumber() {
-  const now = new Date();
-  const yyyy = now.getFullYear();
-  const mm = String(now.getMonth() + 1).padStart(2, "0");
-  const dd = String(now.getDate()).padStart(2, "0");
-  const rand = Math.floor(1000 + Math.random() * 9000);
-  return `MIP-${yyyy}${mm}${dd}-${rand}`;
+  return "MIP-" + Date.now();
 }
 
 // ==============================
-// PAYLOAD BUILDERS
+// PAYLOAD
 // ==============================
 
-// getCargoPayload()
-// getPayload()
-
-// 👉 KEEP THEM EXACTLY AS YOU HAVE THEM
+function getPayload() {
+  return {
+    quoteNumber: generateQuoteNumber(),
+    email: document.querySelector('[name="email"]').value
+  };
+}
 
 // ==============================
 // EVENTS & INIT
 // ==============================
 
 document.addEventListener("DOMContentLoaded", () => {
+
   attachAutocomplete("originCode", "originName", "originCountryManual");
   attachAutocomplete("destinationCode", "destinationName", "destinationCountryManual");
 
   addCargoBtn.addEventListener("click", addCargoItem);
   addCargoItem();
-  syncConditionalSections();
-});
 
-document.querySelectorAll(".toggle-btn[data-group]").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const group = btn.dataset.group;
-    const value = btn.dataset.value;
-    state[group] = value;
-    setGroupActive(group, value);
-    syncConditionalSections();
-    recalcAllCargo();
-  });
-});
-
-document.getElementById("includeInlandFreight").addEventListener("change", function () {
-  document.getElementById("inlandSection").classList.toggle("hidden", !this.checked);
 });
 
 // ==============================
-// FORM SUBMISSION
+// FORM SUBMIT
 // ==============================
 
 document.getElementById("quoteForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const statusBox = document.getElementById("statusBox");
-  statusBox.classList.remove("hidden");
-  statusBox.innerHTML = `<div class="text-sm text-[#8a6247] font-medium">Submitting quote request...</div>`;
+  const payload = getPayload();
 
-  try {
-    const payload = getPayload();
+  await fetch(webhookUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
 
-    const res = await fetch(webhookUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (!res.ok) throw new Error("Webhook request failed");
-
-    statusBox.innerHTML = `
-      <div class="text-sm font-bold text-[#0f6fa6]">Quote request sent successfully.</div>
-      <div class="text-sm text-[#8a6247] mt-2">Quote Number: <strong>${payload.quoteNumber}</strong></div>
-      <div class="text-sm text-[#8a6247] mt-1">A confirmation email will be sent to <strong>${payload.email}</strong>.</div>
-    `;
-  } catch (err) {
-    statusBox.innerHTML = `
-      <div class="text-sm font-bold text-red-600">Something went wrong while submitting the quote.</div>
-      <div class="text-sm text-[#8a6247] mt-1">Please try again.</div>
-    `;
-  }
+  alert("Quote sent!");
 });
