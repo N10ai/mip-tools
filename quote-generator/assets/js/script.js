@@ -1,3 +1,4 @@
+throw new Error("TEST ERROR");
 // ==============================
 // GLOBAL STATE & CONFIG
 // ==============================
