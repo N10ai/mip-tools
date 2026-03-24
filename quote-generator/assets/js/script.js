@@ -95,6 +95,7 @@ function attachAutocomplete(inputId, nameId, countryId) {
 const cargoItemsEl = document.getElementById("cargoItems");
 const addCargoBtn = document.getElementById("addCargoBtn");
 let cargoIndex = 0;
+
 function createCargoItem(index) {
   const wrapper = document.createElement("div");
   wrapper.className = "bg-white border border-[#e2d4c8] rounded-xl p-4";
@@ -104,6 +105,7 @@ function createCargoItem(index) {
     <div class="text-sm font-semibold text-[#0f6fa6] mb-4">Item ${index + 1}</div>
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+      
       <div>
         <label class="label">Qty</label>
         <input type="number" class="field cargo-qty" value="1" min="1">
@@ -115,21 +117,40 @@ function createCargoItem(index) {
       </div>
 
       <div>
+        <label class="label">Weight Unit</label>
+        <select class="field cargo-weight-unit">
+          <option value="kg">kg</option>
+          <option value="lbs">lbs</option>
+        </select>
+      </div>
+
+      <div>
         <label class="label">Length</label>
         <input type="number" class="field cargo-length" value="40">
       </div>
+
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
 
       <div>
         <label class="label">Width</label>
         <input type="number" class="field cargo-width" value="30">
       </div>
-    </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
       <div>
         <label class="label">Height</label>
         <input type="number" class="field cargo-height" value="20">
       </div>
+
+      <div>
+        <label class="label">Dimension Unit</label>
+        <select class="field cargo-dim-unit">
+          <option value="cm">cm</option>
+          <option value="inch">inch</option>
+        </select>
+      </div>
+
     </div>
 
     <div class="text-xs text-[#8a6247] cargo-volume">Volume: —</div>
@@ -148,7 +169,6 @@ function createCargoItem(index) {
 
   return wrapper;
 }
-
 function addCargoItem() {
   cargoItemsEl.appendChild(createCargoItem(cargoIndex));
   cargoIndex++;
