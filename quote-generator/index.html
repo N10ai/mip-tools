@@ -1,1 +1,1087 @@
-quote-generator/index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MIP Cargo Instant Quote</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #f3f1ed;
+      color: #111827;
+    }
+
+    .card-shadow {
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.09);
+    }
+
+    .soft-card {
+      background: #f8f8f4;
+      border: 1px solid #e5d5c7;
+      border-radius: 16px;
+    }
+
+    .field {
+      width: 100%;
+      border: 1px solid #e3cfc0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: #fffefb;
+      outline: none;
+    }
+
+    .field:focus {
+      border-color: #0f6fa6;
+      box-shadow: 0 0 0 3px rgba(15, 111, 166, 0.12);
+    }
+
+    .label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #7b5d4a;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      color: #111827;
+    }
+
+    .toggle-btn {
+      border: 1px solid #e3cfc0;
+      background: #fffdf9;
+      color: #111827;
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-size: 14px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.2s ease;
+      cursor: pointer;
+    }
+
+    .toggle-btn.active {
+      background: #0f6fa6;
+      color: white;
+      border-color: #0f6fa6;
+    }
+
+    .feature-card {
+      background: #fbfaf7;
+      border: 1px solid #dfd6cd;
+      border-radius: 16px;
+      padding: 16px 22px;
+      min-width: 260px;
+    }
+
+    .mini-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: #e8edf0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: #0f6fa6;
+      flex-shrink: 0;
+    }
+
+    .hr-soft {
+      border-top: 1px solid #e5d5c7;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<script>
+
+let logisticsLocations = []
+
+fetch("data/logistics-locations.json")
+.then(res => res.json())
+.then(data => {
+
+logisticsLocations = data
+
+console.log("Locations loaded:", logisticsLocations.length)
+
+})
+.catch(err => {
+
+console.error("Failed to load locations JSON", err)
+
+})
+
+</script>
+<body>
+  <!-- Header -->
+  <header class="bg-[#07163d] text-white shadow-md">
+    <div class="max-w-6xl mx-auto px-4 py-5 flex flex-col items-center justify-center">
+      <img
+        src="https://images.fillout.com/orgid-278758/flowpublicid-sq68cpvhvb/widgetid-default/vLdctMaEwcPZsqqgYeQmyE/pasted-image-1773071890634.png"
+        alt="MIP Cargo Express"
+        class="h-16 w-16 rounded-full object-cover mb-2"
+      />
+      <div class="text-sm font-semibold flex items-center gap-2 opacity-90">
+        ✉ pricing@mipcargoexp.com
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="bg-[#e7edf2] border-b border-[#dfe5ea] py-14 px-4">
+    <div class="max-w-6xl mx-auto text-center">
+      <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900">
+        Instant Freight Quotes
+      </h1>
+      <p class="text-[#8a6247] text-lg mt-4">
+        Get competitive shipping rates - No sign-up required.
+      </p>
+
+      <div class="mt-10 flex flex-col sm:flex-row justify-center gap-6">
+        <div class="feature-card card-shadow flex items-center gap-4">
+          <div class="mini-icon">🚚</div>
+          <div class="text-left">
+            <div class="font-bold text-lg">Fast Delivery</div>
+            <div class="text-[#8a6247]">Express & standard options</div>
+          </div>
+        </div>
+
+        <div class="feature-card card-shadow flex items-center gap-4">
+          <div class="mini-icon">🌐</div>
+          <div class="text-left">
+            <div class="font-bold text-lg">Worldwide</div>
+            <div class="text-[#8a6247]">200+ countries covered</div>
+          </div>
+        </div>
+
+        <div class="feature-card card-shadow flex items-center gap-4">
+          <div class="mini-icon">🛡</div>
+          <div class="text-left">
+            <div class="font-bold text-lg">Insured Cargo</div>
+            <div class="text-[#8a6247]">Full cargo protection</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main -->
+  <main class="max-w-5xl mx-auto px-4 py-10">
+    <div class="bg-[#fbfaf7] rounded-[24px] border border-[#e3d6ca] p-6 md:p-10 card-shadow">
+      <h2 class="text-2xl font-extrabold text-slate-900">Request a Quote</h2>
+      <p class="text-[#8a6247] mt-2 text-base leading-relaxed">
+        Fill in your shipment details below.<br>
+        (After you submit your request, you will receive a confirmation email with your reference Number)
+      </p>
+
+      <form id="quoteForm" class="space-y-6 mt-8">
+        <!-- Quote Details -->
+        <section class="soft-card p-5 card-shadow">
+          <div class="section-title">
+            <span>#</span>
+            <span>Quote Details</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="label">Reference Number (optional)</label>
+              <input class="field" name="referenceNumber" placeholder="e.g. PO-2024-001">
+            </div>
+            <div>
+              <label class="label">Email Address</label>
+              <input class="field" name="email" type="email" required placeholder="you@example.com">
+            </div>
+          </div>
+        </section>
+
+        <!-- Service Configuration -->
+        <section class="soft-card p-5 card-shadow">
+          <div class="section-title">
+            <span>⚙</span>
+            <span>Service Configuration</span>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label class="label">Transport Mode</label>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" class="toggle-btn active" data-group="transportMode" data-value="air">✈ Air</button>
+                <button type="button" class="toggle-btn" data-group="transportMode" data-value="ocean">🚢 Ocean</button>
+                <button type="button" class="toggle-btn" data-group="transportMode" data-value="ground">🚚 Ground</button>
+              </div>
+            </div>
+
+            <div id="tradeDirectionWrap">
+              <label class="label">Trade Direction</label>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" class="toggle-btn active" data-group="tradeDirection" data-value="import">Import</button>
+                <button type="button" class="toggle-btn" data-group="tradeDirection" data-value="export">Export</button>
+              </div>
+            </div>
+
+            <div id="loadTypeWrap" class="hidden">
+              <label class="label">Load Type</label>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" class="toggle-btn active" data-group="loadType" data-value="lcl">LCL — Less than Container</button>
+                <button type="button" class="toggle-btn" data-group="loadType" data-value="fcl">FCL — Full Container</button>
+              </div>
+            </div>
+
+            <div id="containerTypeWrap" class="hidden">
+              <label class="label">Container Type</label>
+              <select id="containerType" class="field">
+                <option value="20GP">20GP</option>
+                <option value="40GP">40GP</option>
+                <option value="40HQ">40HQ</option>
+                <option value="45HQ">45HQ</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <!-- Route for Air / Ocean -->
+        <section id="routeAirOceanSection" class="soft-card p-5 card-shadow">
+          <div class="section-title">
+            <span>📍</span>
+            <span>Origin / Destination</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <section>
+              <div class="space-y-4">
+                <div>
+                  <label id="originCodeLabel" class="label">Origin Airport / Port Code</label>
+                  <input id="originCode" class="field" placeholder="e.g. MIA or CNSHA">
+                </div>
+                <div>
+                  <label id="originNameLabel" class="label">Origin Airport / Port Name</label>
+                  <input id="originName" class="field" placeholder="e.g. Miami International Airport / Port of Shanghai">
+                </div>
+                <div>
+                  <label class="label">Origin Country</label>
+                  <input id="originCountryManual" class="field" placeholder="e.g. United States">
+                </div>
+              </div>
+            </section>
+
+            <section>
+              <div class="space-y-4">
+                <div>
+                  <label id="destinationCodeLabel" class="label">Destination Airport / Port Code</label>
+                  <input id="destinationCode" class="field" placeholder="e.g. UIO or USMIA">
+                </div>
+                <div>
+                  <label id="destinationNameLabel" class="label">Destination Airport / Port Name</label>
+                  <input id="destinationName" class="field" placeholder="e.g. Mariscal Sucre Airport / Port of Miami">
+                </div>
+                <div>
+                  <label class="label">Destination Country</label>
+                  <input id="destinationCountryManual" class="field" placeholder="e.g. Ecuador">
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <!-- Route for Ground -->
+        <section id="routeGroundSection" class="soft-card p-5 card-shadow hidden">
+          <div class="section-title">
+            <span>📍</span>
+            <span>Ground Route Addresses</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <section>
+              <div class="font-semibold mb-3">Origin Address</div>
+              <div class="space-y-4">
+                <div>
+                  <label class="label">Company / Contact Name</label>
+                  <input id="groundOriginCompany" class="field" placeholder="ABC Corp">
+                </div>
+                <div>
+                  <label class="label">Street Address</label>
+                  <input id="groundOriginAddress" class="field" placeholder="123 Main St">
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label class="label">City</label>
+                    <input id="groundOriginCity" class="field" placeholder="Miami">
+                  </div>
+                  <div>
+                    <label class="label">State</label>
+                    <input id="groundOriginState" class="field" placeholder="FL">
+                  </div>
+                  <div>
+                    <label class="label">ZIP Code</label>
+                    <input id="groundOriginZip" class="field" placeholder="33166">
+                  </div>
+                </div>
+                <div>
+                  <label class="label">Country</label>
+                  <input id="groundOriginCountry" class="field" placeholder="United States">
+                </div>
+              </div>
+            </section>
+
+            <section>
+              <div class="font-semibold mb-3">Destination Address</div>
+              <div class="space-y-4">
+                <div>
+                  <label class="label">Company / Contact Name</label>
+                  <input id="groundDestinationCompany" class="field" placeholder="XYZ Imports">
+                </div>
+                <div>
+                  <label class="label">Street Address</label>
+                  <input id="groundDestinationAddress" class="field" placeholder="456 Harbor Rd">
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label class="label">City</label>
+                    <input id="groundDestinationCity" class="field" placeholder="Orlando">
+                  </div>
+                  <div>
+                    <label class="label">State</label>
+                    <input id="groundDestinationState" class="field" placeholder="FL">
+                  </div>
+                  <div>
+                    <label class="label">ZIP Code</label>
+                    <input id="groundDestinationZip" class="field" placeholder="32801">
+                  </div>
+                </div>
+                <div>
+                  <label class="label">Country</label>
+                  <input id="groundDestinationCountry" class="field" placeholder="United States">
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <!-- Cargo -->
+        <section class="soft-card p-5 card-shadow">
+          <div class="section-title">
+            <span>📦</span>
+            <span>Cargo Details</span>
+          </div>
+
+          <div id="cargoItems" class="space-y-4"></div>
+
+          <button
+            type="button"
+            id="addCargoBtn"
+            class="w-full border border-dashed border-[#d9cbbb] rounded-lg py-2.5 text-sm font-medium hover:bg-white"
+          >
+            ＋ Add Another Item
+          </button>
+        </section>
+
+        <!-- Inland Freight for Air/Ocean only -->
+        <section id="inlandAirOceanSection" class="soft-card p-5 card-shadow">
+          <div class="section-title">
+            <span>🚚</span>
+            <span>Inland Freight</span>
+          </div>
+
+          <label class="flex items-center gap-3 text-sm font-medium">
+            <input id="includeInlandFreight" type="checkbox" class="h-4 w-4">
+            <span>Include Pickup and Delivery Inland Transport</span>
+          </label>
+
+          <div id="inlandSection" class="hidden mt-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <section>
+                <div class="font-semibold mb-3">Pickup Address</div>
+                <div class="space-y-4">
+                  <div>
+                    <label class="label">Company / Contact Name</label>
+                    <input id="pickupCompany" class="field" placeholder="ABC Corp">
+                  </div>
+                  <div>
+                    <label class="label">Phone (optional)</label>
+                    <input id="pickupPhone" class="field" placeholder="+1 (555) 000-0000">
+                  </div>
+                  <div>
+                    <label class="label">Street Address</label>
+                    <input id="pickupAddress" class="field" placeholder="123 Main St">
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label class="label">City</label>
+                      <input id="pickupCity" class="field" placeholder="Miami">
+                    </div>
+                    <div>
+                      <label class="label">State</label>
+                      <input id="pickupState" class="field" placeholder="FL">
+                    </div>
+                    <div>
+                      <label class="label">ZIP Code</label>
+                      <input id="pickupZip" class="field" placeholder="33166">
+                    </div>
+                  </div>
+                  <div>
+                    <label class="label">Country</label>
+                    <input id="pickupCountry" class="field" placeholder="United States">
+                  </div>
+                </div>
+              </section>
+
+              <section>
+                <div class="font-semibold mb-3">Delivery Address</div>
+                <div class="space-y-4">
+                  <div>
+                    <label class="label">Company / Contact Name</label>
+                    <input id="deliveryCompany" class="field" placeholder="XYZ Imports">
+                  </div>
+                  <div>
+                    <label class="label">Phone (optional)</label>
+                    <input id="deliveryPhone" class="field" placeholder="+1 (555) 000-0000">
+                  </div>
+                  <div>
+                    <label class="label">Street Address</label>
+                    <input id="deliveryAddress" class="field" placeholder="456 Harbor Rd">
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label class="label">City</label>
+                      <input id="deliveryCity" class="field" placeholder="Orlando">
+                    </div>
+                    <div>
+                      <label class="label">State</label>
+                      <input id="deliveryState" class="field" placeholder="FL">
+                    </div>
+                    <div>
+                      <label class="label">ZIP Code</label>
+                      <input id="deliveryZip" class="field" placeholder="32801">
+                    </div>
+                  </div>
+                  <div>
+                    <label class="label">Country</label>
+                    <input id="deliveryCountry" class="field" placeholder="United States">
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <div class="mt-4">
+              <label class="label">Special Instructions (optional)</label>
+              <input id="inlandNotes" class="field" placeholder="e.g. Call before arrival, loading dock available">
+            </div>
+          </div>
+        </section>
+
+        <button
+          type="submit"
+          class="w-full bg-[#0f6fa6] hover:bg-[#0c5e8d] text-white py-3.5 rounded-lg font-bold text-sm"
+        >
+          Get Instant Quote
+        </button>
+      </form>
+
+      <div id="statusBox" class="mt-6 hidden rounded-xl border border-[#d9cbbb] bg-white p-4"></div>
+    </div>
+  </main>
+
+  <script>
+    const webhookUrl = "https://n8n-n10ai.onrender.com/webhook/aa85e69c-a50a-4177-a95d-692ab0c141fc";
+
+    const state = {
+      transportMode: "air",
+      tradeDirection: "import",
+      loadType: "lcl"
+    };
+
+/* ------------------------------
+LOCATION AUTOCOMPLETE
+------------------------------ */
+
+function searchLocations(query) {
+
+  query = query.toLowerCase()
+
+  let typeFilter = null
+
+  if(state.transportMode === "air") typeFilter = "airport"
+  if(state.transportMode === "ocean") typeFilter = "seaport"
+
+  return logisticsLocations
+    .filter(loc => !typeFilter || loc.type === typeFilter)
+    .filter(loc =>
+      loc.code.toLowerCase().includes(query) ||
+      loc.name.toLowerCase().includes(query) ||
+      loc.city.toLowerCase().includes(query) ||
+      loc.country.toLowerCase().includes(query)
+    )
+    .sort((a,b)=>{
+
+      const aStarts = a.code.toLowerCase().startsWith(query)
+      const bStarts = b.code.toLowerCase().startsWith(query)
+
+      if(aStarts && !bStarts) return -1
+      if(!aStarts && bStarts) return 1
+
+      return 0
+
+    })
+    .slice(0,8)
+
+}
+
+function attachAutocomplete(inputId, nameId, countryId){
+
+  const input = document.getElementById(inputId)
+  const nameField = document.getElementById(nameId)
+  const countryField = document.getElementById(countryId)
+
+  const dropdown = document.createElement("div")
+
+  dropdown.style.position = "absolute"
+  dropdown.style.background = "white"
+  dropdown.style.border = "1px solid #ddd"
+  dropdown.style.borderRadius = "8px"
+  dropdown.style.zIndex = "999"
+  dropdown.style.width = input.offsetWidth + "px"
+  dropdown.style.maxHeight = "220px"
+  dropdown.style.overflowY = "auto"
+  dropdown.classList.add("hidden")
+
+  input.parentElement.appendChild(dropdown)
+
+  input.addEventListener("input", ()=>{
+
+    const query = input.value.trim()
+
+    if(query.length < 2){
+      dropdown.classList.add("hidden")
+      return
+    }
+
+    const results = searchLocations(query)
+
+    dropdown.innerHTML = ""
+
+    results.forEach(loc=>{
+
+      const option = document.createElement("div")
+
+      option.style.padding = "8px 10px"
+      option.style.cursor = "pointer"
+      option.style.fontSize = "13px"
+
+      option.innerHTML = `<b>${loc.code}</b> — ${loc.name} (${loc.country})`
+
+      option.onclick = ()=>{
+
+        input.value = loc.code
+        nameField.value = loc.name
+        countryField.value = loc.country
+
+        dropdown.classList.add("hidden")
+
+      }
+
+      dropdown.appendChild(option)
+
+    })
+
+    dropdown.classList.remove("hidden")
+
+  })
+
+  document.addEventListener("click", (e)=>{
+
+    if(!input.contains(e.target) && !dropdown.contains(e.target)){
+      dropdown.classList.add("hidden")
+    }
+
+  })
+
+}
+
+/* activate */
+
+document.addEventListener("DOMContentLoaded", ()=>{
+
+  attachAutocomplete(
+    "originCode",
+    "originName",
+    "originCountryManual"
+  )
+
+  attachAutocomplete(
+    "destinationCode",
+    "destinationName",
+    "destinationCountryManual"
+  )
+
+})
+    function generateQuoteNumber() {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, "0");
+      const dd = String(now.getDate()).padStart(2, "0");
+      const rand = Math.floor(1000 + Math.random() * 9000);
+      return `MIP-${yyyy}${mm}${dd}-${rand}`;
+    }
+
+    function setGroupActive(group, value) {
+      document.querySelectorAll(`[data-group="${group}"]`).forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.value === value);
+      });
+    }
+
+    function syncConditionalSections() {
+      const loadTypeWrap = document.getElementById("loadTypeWrap");
+      const containerTypeWrap = document.getElementById("containerTypeWrap");
+      const routeAirOceanSection = document.getElementById("routeAirOceanSection");
+      const routeGroundSection = document.getElementById("routeGroundSection");
+      const inlandAirOceanSection = document.getElementById("inlandAirOceanSection");
+      const tradeDirectionWrap = document.getElementById("tradeDirectionWrap");
+
+      if (state.transportMode === "ocean") {
+        loadTypeWrap.classList.remove("hidden");
+      } else {
+        loadTypeWrap.classList.add("hidden");
+        containerTypeWrap.classList.add("hidden");
+      }
+
+      if (state.transportMode === "ocean" && state.loadType === "fcl") {
+        containerTypeWrap.classList.remove("hidden");
+      } else {
+        containerTypeWrap.classList.add("hidden");
+      }
+
+      if (state.transportMode === "ground") {
+        routeAirOceanSection.classList.add("hidden");
+        routeGroundSection.classList.remove("hidden");
+        inlandAirOceanSection.classList.add("hidden");
+        document.getElementById("inlandSection").classList.add("hidden");
+        document.getElementById("includeInlandFreight").checked = false;
+        tradeDirectionWrap.classList.add("hidden");
+      } else {
+        routeAirOceanSection.classList.remove("hidden");
+        routeGroundSection.classList.add("hidden");
+        inlandAirOceanSection.classList.remove("hidden");
+        tradeDirectionWrap.classList.remove("hidden");
+      }
+
+      const isAir = state.transportMode === "air";
+
+      document.getElementById("originCodeLabel").textContent = isAir ? "Origin Airport Code" : "Origin Port Code";
+      document.getElementById("originNameLabel").textContent = isAir ? "Origin Airport Name" : "Origin Port Name";
+      document.getElementById("destinationCodeLabel").textContent = isAir ? "Destination Airport Code" : "Destination Port Code";
+      document.getElementById("destinationNameLabel").textContent = isAir ? "Destination Airport Name" : "Destination Port Name";
+
+      document.getElementById("originCode").placeholder = isAir ? "e.g. MIA" : "e.g. CNSHA";
+      document.getElementById("originName").placeholder = isAir ? "e.g. Miami International Airport" : "e.g. Port of Shanghai";
+      document.getElementById("destinationCode").placeholder = isAir ? "e.g. UIO" : "e.g. USMIA";
+      document.getElementById("destinationName").placeholder = isAir ? "e.g. Mariscal Sucre Airport" : "e.g. Port of Miami";
+    }
+
+    document.querySelectorAll(".toggle-btn[data-group]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const group = btn.dataset.group;
+        const value = btn.dataset.value;
+        state[group] = value;
+        setGroupActive(group, value);
+        syncConditionalSections();
+        recalcAllCargo();
+      });
+    });
+
+    document.getElementById("includeInlandFreight").addEventListener("change", function () {
+      document.getElementById("inlandSection").classList.toggle("hidden", !this.checked);
+    });
+
+    const cargoItemsEl = document.getElementById("cargoItems");
+    const addCargoBtn = document.getElementById("addCargoBtn");
+    let cargoIndex = 0;
+
+    function createCargoItem(index) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "bg-white border border-[#e2d4c8] rounded-xl p-4";
+      wrapper.dataset.index = index;
+
+      wrapper.innerHTML = `
+        <div class="text-sm font-semibold text-[#0f6fa6] mb-4">Item ${index + 1}</div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+          <div>
+            <label class="label">Commodity</label>
+            <input class="field cargo-commodity" placeholder="e.g. Electronics, Clothing">
+          </div>
+
+          <div>
+            <label class="label">Packaging Type</label>
+            <select class="field cargo-packaging">
+              <option value="Pallet">Pallet</option>
+              <option value="Box">Box</option>
+              <option value="Crate">Crate</option>
+              <option value="Drum">Drum</option>
+              <option value="Bag">Bag</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="label">Cargo Type</label>
+            <select class="field cargo-type">
+              <option value="General">General</option>
+              <option value="Fragile">Fragile</option>
+              <option value="Hazardous">Hazardous</option>
+              <option value="Refrigerated">Refrigerated</option>
+              <option value="Oversized">Oversized</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="label">Qty</label>
+            <input type="number" class="field cargo-qty" value="1" min="1">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-4">
+          <div>
+            <label class="label">Weight</label>
+            <input type="number" step="any" class="field cargo-weight" value="10">
+          </div>
+
+          <div>
+            <label class="label">Weight Unit</label>
+            <select class="field cargo-weight-unit">
+              <option value="kg">kg</option>
+              <option value="lbs">lbs</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="label">Length</label>
+            <input type="number" step="any" class="field cargo-length" value="40">
+          </div>
+
+          <div>
+            <label class="label">Width</label>
+            <input type="number" step="any" class="field cargo-width" value="30">
+          </div>
+
+          <div>
+            <label class="label">Height</label>
+            <input type="number" step="any" class="field cargo-height" value="20">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+          <div>
+            <label class="label">Dimension Unit</label>
+            <select class="field cargo-dim-unit">
+              <option value="inch">inch</option>
+              <option value="cm">cm</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="text-xs text-[#8a6247] cargo-volume">Volume: —</div>
+        <div class="text-xs text-[#8a6247] cargo-volumetric">Volumetric Weight: —</div>
+        <div class="text-xs text-[#8a6247] cargo-chargeable">Chargeable Weight: —</div>
+
+        <button type="button" class="mt-3 text-sm text-red-600 font-medium remove-cargo">Remove</button>
+      `;
+
+      const weightUnitEl = wrapper.querySelector(".cargo-weight-unit");
+      const dimUnitEl = wrapper.querySelector(".cargo-dim-unit");
+
+      weightUnitEl.dataset.prevUnit = weightUnitEl.value;
+      dimUnitEl.dataset.prevUnit = dimUnitEl.value;
+
+      wrapper.addEventListener("input", (e) => {
+        if (
+          e.target.classList.contains("cargo-weight") ||
+          e.target.classList.contains("cargo-length") ||
+          e.target.classList.contains("cargo-width") ||
+          e.target.classList.contains("cargo-height") ||
+          e.target.classList.contains("cargo-qty")
+        ) {
+          recalcCargo(wrapper);
+        }
+      });
+
+      weightUnitEl.addEventListener("change", () => {
+        const weightInput = wrapper.querySelector(".cargo-weight");
+        const oldUnit = weightUnitEl.dataset.prevUnit || "kg";
+        const newUnit = weightUnitEl.value;
+        const value = parseFloat(weightInput.value);
+
+        if (!Number.isNaN(value)) {
+          if (oldUnit === "kg" && newUnit === "lbs") {
+            weightInput.value = (value * 2.20462).toFixed(2);
+          } else if (oldUnit === "lbs" && newUnit === "kg") {
+            weightInput.value = (value / 2.20462).toFixed(2);
+          }
+        }
+
+        weightUnitEl.dataset.prevUnit = newUnit;
+        recalcCargo(wrapper);
+      });
+
+      dimUnitEl.addEventListener("change", () => {
+        const oldUnit = dimUnitEl.dataset.prevUnit || "inch";
+        const newUnit = dimUnitEl.value;
+        const dimFields = [
+          wrapper.querySelector(".cargo-length"),
+          wrapper.querySelector(".cargo-width"),
+          wrapper.querySelector(".cargo-height")
+        ];
+
+        dimFields.forEach(input => {
+          const value = parseFloat(input.value);
+          if (!Number.isNaN(value)) {
+            if (oldUnit === "cm" && newUnit === "inch") {
+              input.value = (value / 2.54).toFixed(2);
+            } else if (oldUnit === "inch" && newUnit === "cm") {
+              input.value = (value * 2.54).toFixed(2);
+            }
+          }
+        });
+
+        dimUnitEl.dataset.prevUnit = newUnit;
+        recalcCargo(wrapper);
+      });
+
+      wrapper.querySelector(".remove-cargo").addEventListener("click", () => {
+        wrapper.remove();
+        renumberCargoItems();
+      });
+
+      return wrapper;
+    }
+
+    function addCargoItem() {
+      cargoItemsEl.appendChild(createCargoItem(cargoIndex));
+      cargoIndex++;
+      renumberCargoItems();
+      recalcAllCargo();
+    }
+
+    function renumberCargoItems() {
+      const items = cargoItemsEl.querySelectorAll("[data-index]");
+      items.forEach((item, i) => {
+        item.querySelector(".text-sm.font-semibold").textContent = `Item ${i + 1}`;
+      });
+    }
+
+    function recalcCargo(wrapper) {
+      const qty = parseFloat(wrapper.querySelector(".cargo-qty").value) || 0;
+      const weight = parseFloat(wrapper.querySelector(".cargo-weight").value) || 0;
+      const weightUnit = wrapper.querySelector(".cargo-weight-unit").value;
+
+      let length = parseFloat(wrapper.querySelector(".cargo-length").value) || 0;
+      let width = parseFloat(wrapper.querySelector(".cargo-width").value) || 0;
+      let height = parseFloat(wrapper.querySelector(".cargo-height").value) || 0;
+      const dimUnit = wrapper.querySelector(".cargo-dim-unit").value;
+
+      let actualWeightKg = weightUnit === "lbs" ? weight / 2.20462 : weight;
+
+      let lCm = length;
+      let wCm = width;
+      let hCm = height;
+
+      if (dimUnit === "inch") {
+        lCm = length * 2.54;
+        wCm = width * 2.54;
+        hCm = height * 2.54;
+      }
+
+      const cbm = (lCm * wCm * hCm) / 1000000;
+      const totalCbm = cbm * qty;
+
+      let volumetricWeightKg = 0;
+
+      if (state.transportMode === "air") {
+        volumetricWeightKg = ((lCm * wCm * hCm) / 6000) * qty;
+      } else if (state.transportMode === "ground") {
+        volumetricWeightKg = ((lCm * wCm * hCm) / 5000) * qty;
+      } else {
+        volumetricWeightKg = totalCbm * 1000;
+      }
+
+      const totalActualWeightKg = actualWeightKg * qty;
+      const chargeableKg = Math.max(totalActualWeightKg, volumetricWeightKg);
+
+      wrapper.querySelector(".cargo-volume").textContent = `Volume: ${totalCbm.toFixed(3)} CBM`;
+      wrapper.querySelector(".cargo-volumetric").textContent = `Volumetric Weight: ${volumetricWeightKg.toFixed(2)} kg`;
+      wrapper.querySelector(".cargo-chargeable").textContent = `Chargeable Weight: ${chargeableKg.toFixed(2)} kg`;
+    }
+
+    function recalcAllCargo() {
+      cargoItemsEl.querySelectorAll("[data-index]").forEach(recalcCargo);
+    }
+
+    addCargoBtn.addEventListener("click", addCargoItem);
+    addCargoItem();
+    syncConditionalSections();
+
+    function getCargoPayload() {
+      const items = [];
+      cargoItemsEl.querySelectorAll("[data-index]").forEach(wrapper => {
+        const qty = parseFloat(wrapper.querySelector(".cargo-qty").value) || 0;
+        const weight = parseFloat(wrapper.querySelector(".cargo-weight").value) || 0;
+        const weightUnit = wrapper.querySelector(".cargo-weight-unit").value;
+        const length = parseFloat(wrapper.querySelector(".cargo-length").value) || 0;
+        const width = parseFloat(wrapper.querySelector(".cargo-width").value) || 0;
+        const height = parseFloat(wrapper.querySelector(".cargo-height").value) || 0;
+        const dimUnit = wrapper.querySelector(".cargo-dim-unit").value;
+
+        let actualWeightKg = weightUnit === "lbs" ? weight / 2.20462 : weight;
+        let lCm = dimUnit === "inch" ? length * 2.54 : length;
+        let wCm = dimUnit === "inch" ? width * 2.54 : width;
+        let hCm = dimUnit === "inch" ? height * 2.54 : height;
+
+        const cbmPerUnit = (lCm * wCm * hCm) / 1000000;
+        const totalCbm = cbmPerUnit * qty;
+
+        let volumetricWeightKg = 0;
+        if (state.transportMode === "air") {
+          volumetricWeightKg = ((lCm * wCm * hCm) / 6000) * qty;
+        } else if (state.transportMode === "ground") {
+          volumetricWeightKg = ((lCm * wCm * hCm) / 5000) * qty;
+        } else {
+          volumetricWeightKg = totalCbm * 1000;
+        }
+
+        const totalActualWeightKg = actualWeightKg * qty;
+        const chargeableWeightKg = Math.max(totalActualWeightKg, volumetricWeightKg);
+
+        items.push({
+          commodity: wrapper.querySelector(".cargo-commodity").value,
+          packagingType: wrapper.querySelector(".cargo-packaging").value,
+          cargoType: wrapper.querySelector(".cargo-type").value,
+          qty,
+          weight,
+          weightUnit,
+          length,
+          width,
+          height,
+          dimUnit,
+          totalActualWeightKg: Number(totalActualWeightKg.toFixed(2)),
+          volumetricWeightKg: Number(volumetricWeightKg.toFixed(2)),
+          chargeableWeightKg: Number(chargeableWeightKg.toFixed(2)),
+          totalVolumeCbm: Number(totalCbm.toFixed(3))
+        });
+      });
+      return items;
+    }
+
+    function getPayload() {
+      const quoteNumber = generateQuoteNumber();
+      const includeInland = state.transportMode !== "ground" && document.getElementById("includeInlandFreight").checked;
+
+      const payload = {
+        quoteNumber,
+        referenceNumber: document.querySelector('[name="referenceNumber"]').value,
+        email: document.querySelector('[name="email"]').value,
+        transportMode: state.transportMode,
+        tradeDirection: state.transportMode === "ground" ? "" : state.tradeDirection,
+        loadType: state.transportMode === "ocean" ? state.loadType : "",
+        containerType: (state.transportMode === "ocean" && state.loadType === "fcl")
+          ? document.getElementById("containerType").value
+          : "",
+        cargo: getCargoPayload(),
+
+        originCode: state.transportMode === "ground" ? "" : document.getElementById("originCode").value,
+        originName: state.transportMode === "ground" ? "" : document.getElementById("originName").value,
+        originCountry: state.transportMode === "ground" ? "" : document.getElementById("originCountryManual").value,
+
+        destinationCode: state.transportMode === "ground" ? "" : document.getElementById("destinationCode").value,
+        destinationName: state.transportMode === "ground" ? "" : document.getElementById("destinationName").value,
+        destinationCountry: state.transportMode === "ground" ? "" : document.getElementById("destinationCountryManual").value,
+
+        groundOriginCompany: state.transportMode === "ground" ? document.getElementById("groundOriginCompany").value : "",
+        groundOriginAddress: state.transportMode === "ground" ? document.getElementById("groundOriginAddress").value : "",
+        groundOriginCity: state.transportMode === "ground" ? document.getElementById("groundOriginCity").value : "",
+        groundOriginState: state.transportMode === "ground" ? document.getElementById("groundOriginState").value : "",
+        groundOriginZip: state.transportMode === "ground" ? document.getElementById("groundOriginZip").value : "",
+        groundOriginCountry: state.transportMode === "ground" ? document.getElementById("groundOriginCountry").value : "",
+
+        groundDestinationCompany: state.transportMode === "ground" ? document.getElementById("groundDestinationCompany").value : "",
+        groundDestinationAddress: state.transportMode === "ground" ? document.getElementById("groundDestinationAddress").value : "",
+        groundDestinationCity: state.transportMode === "ground" ? document.getElementById("groundDestinationCity").value : "",
+        groundDestinationState: state.transportMode === "ground" ? document.getElementById("groundDestinationState").value : "",
+        groundDestinationZip: state.transportMode === "ground" ? document.getElementById("groundDestinationZip").value : "",
+        groundDestinationCountry: state.transportMode === "ground" ? document.getElementById("groundDestinationCountry").value : "",
+
+        inlandFreight: includeInland,
+        pickupCompany: includeInland ? document.getElementById("pickupCompany").value : "",
+        pickupPhone: includeInland ? document.getElementById("pickupPhone").value : "",
+        pickupAddress: includeInland ? document.getElementById("pickupAddress").value : "",
+        pickupCity: includeInland ? document.getElementById("pickupCity").value : "",
+        pickupState: includeInland ? document.getElementById("pickupState").value : "",
+        pickupZip: includeInland ? document.getElementById("pickupZip").value : "",
+        pickupCountry: includeInland ? document.getElementById("pickupCountry").value : "",
+
+        deliveryCompany: includeInland ? document.getElementById("deliveryCompany").value : "",
+        deliveryPhone: includeInland ? document.getElementById("deliveryPhone").value : "",
+        deliveryAddress: includeInland ? document.getElementById("deliveryAddress").value : "",
+        deliveryCity: includeInland ? document.getElementById("deliveryCity").value : "",
+        deliveryState: includeInland ? document.getElementById("deliveryState").value : "",
+        deliveryZip: includeInland ? document.getElementById("deliveryZip").value : "",
+        deliveryCountry: includeInland ? document.getElementById("deliveryCountry").value : "",
+        inlandNotes: includeInland ? document.getElementById("inlandNotes").value : ""
+      };
+
+      return payload;
+    }
+
+    document.getElementById("quoteForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const statusBox = document.getElementById("statusBox");
+      statusBox.classList.remove("hidden");
+      statusBox.innerHTML = `<div class="text-sm text-[#8a6247] font-medium">Submitting quote request...</div>`;
+
+      try {
+        const payload = getPayload();
+
+        const res = await fetch(webhookUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          throw new Error("Webhook request failed");
+        }
+
+        statusBox.innerHTML = `
+          <div class="text-sm font-bold text-[#0f6fa6]">Quote request sent successfully.</div>
+          <div class="text-sm text-[#8a6247] mt-2">Quote Number: <strong>${payload.quoteNumber}</strong></div>
+          <div class="text-sm text-[#8a6247] mt-1">A confirmation email will be sent to <strong>${payload.email}</strong>.</div>
+        `;
+      } catch (err) {
+        statusBox.innerHTML = `
+          <div class="text-sm font-bold text-red-600">Something went wrong while submitting the quote.</div>
+          <div class="text-sm text-[#8a6247] mt-1">Please try again.</div>
+        `;
+      }
+    });
+  </script>
+
+
+
+</body>
+</html>
