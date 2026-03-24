@@ -1,4 +1,23 @@
-   const webhookUrl = "https://n8n-n10ai.onrender.com/webhook/aa85e69c-a50a-4177-a95d-692ab0c141fc";
+let logisticsLocations = []
+fetch('assets/data/logistics-locations.json')
+.then(res => res.json())
+.then(data => {
+
+logisticsLocations = data
+
+console.log("Locations loaded:", logisticsLocations.length)
+
+})
+.catch(err => {
+
+console.error("Failed to load locations JSON", err)
+
+})
+
+
+
+
+const webhookUrl = "https://n8n-n10ai.onrender.com/webhook/aa85e69c-a50a-4177-a95d-692ab0c141fc";
 
     const state = {
       transportMode: "air",
