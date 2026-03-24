@@ -102,74 +102,94 @@ function createCargoItem(index) {
   wrapper.dataset.index = index;
 
   wrapper.innerHTML = `
+    
+    <!-- TOP ROW -->
     <div class="flex items-center gap-4 mb-4">
-      <div class="text-xl font-bold text-blue-700">Item ${index + 1}</div>
+      <div class="text-xl font-bold text-blue-700 w-24">Item ${index + 1}</div>
+
       <input class="field cargo-commodity flex-1" placeholder="Commodity">
-      <select class="field cargo-type w-40">
+
+      <select class="field cargo-type w-48">
         <option>General</option>
         <option>Fragile</option>
         <option>Hazardous</option>
       </select>
     </div>
 
-    <div class="grid grid-cols-12 gap-3 items-end">
+    <!-- MAIN GRID -->
+    <div class="flex gap-4 items-start">
 
-      <!-- QTY -->
-      <div class="col-span-1">
-        <label class="label">Qty</label>
-        <input type="number" class="field cargo-qty text-center" value="1">
+      <!-- QTY BLOCK -->
+      <div class="flex flex-col items-center">
+        <label class="text-sm text-gray-600 mb-1">Qty</label>
+        <input type="number" class="field cargo-qty text-center w-16 h-16 text-lg" value="1">
       </div>
 
-      <!-- PACKAGING -->
-      <div class="col-span-2">
-        <label class="label">Packaging</label>
-        <select class="field cargo-packaging">
-          <option>Pallet</option>
-          <option>Box</option>
-          <option>Crate</option>
-        </select>
-      </div>
+      <!-- RIGHT SIDE -->
+      <div class="flex-1">
 
-      <!-- WEIGHT -->
-      <div class="col-span-3 flex gap-2 items-end">
-        <div class="flex-1">
-          <label class="label">Weight</label>
-          <input type="number" class="field cargo-weight" value="10">
-        </div>
-        <div class="w-20">
-          <label class="label">Unit</label>
-          <select class="field cargo-weight-unit">
-            <option value="kg">kg</option>
-            <option value="lbs">lbs</option>
-          </select>
-        </div>
-      </div>
+        <!-- ROW 1 -->
+        <div class="flex gap-4 items-end mb-3">
 
-      <!-- DIMENSIONS -->
-      <div class="col-span-5 flex gap-2 items-end">
-        <div>
-          <label class="label">L</label>
-          <input type="number" class="field cargo-length w-20" value="40">
-        </div>
-        <div class="pt-6">×</div>
-        <div>
-          <label class="label">W</label>
-          <input type="number" class="field cargo-width w-20" value="30">
-        </div>
-        <div class="pt-6">×</div>
-        <div>
-          <label class="label">H</label>
-          <input type="number" class="field cargo-height w-20" value="20">
-        </div>
-        <div>
-          <label class="label">Unit</label>
-          <select class="field cargo-dim-unit w-20">
-            <option value="cm">cm</option>
-            <option value="inch">inch</option>
-          </select>
-        </div>
-      </div>
+          <div>
+            <label class="label">Packaging</label>
+            <select class="field cargo-packaging w-40">
+              <option>Pallet</option>
+              <option>Box</option>
+              <option>Crate</option>
+            </select>
+          </div>
 
+          <div class="flex gap-2 items-end">
+            <div>
+              <label class="label">Weight</label>
+              <input type="number" class="field cargo-weight w-28" value="10">
+            </div>
+
+            <div>
+              <label class="label invisible">Unit</label>
+              <select class="field cargo-weight-unit w-20">
+                <option value="kg">kg</option>
+                <option value="lbs">lbs</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ROW 2 (DIMENSIONS) -->
+        <div class="flex gap-2 items-end">
+
+          <div>
+            <label class="label">Length</label>
+            <input type="number" class="field cargo-length w-20" value="40">
+          </div>
+
+          <div class="pb-2">×</div>
+
+          <div>
+            <label class="label">Width</label>
+            <input type="number" class="field cargo-width w-20" value="30">
+          </div>
+
+          <div class="pb-2">×</div>
+
+          <div>
+            <label class="label">Height</label>
+            <input type="number" class="field cargo-height w-20" value="20">
+          </div>
+
+          <div>
+            <label class="label invisible">Unit</label>
+            <select class="field cargo-dim-unit w-20">
+              <option value="cm">cm</option>
+              <option value="inch">inch</option>
+            </select>
+          </div>
+
+        </div>
+
+      </div>
     </div>
 
     <!-- RESULTS -->
@@ -179,7 +199,8 @@ function createCargoItem(index) {
       <div class="cargo-chargeable">Chargeable: —</div>
     </div>
 
-    <div class="flex justify-end gap-3 mt-3 text-sm">
+    <!-- ACTIONS -->
+    <div class="flex justify-end gap-4 mt-3 text-sm">
       <button class="duplicate text-gray-600">Duplicate</button>
       <button class="remove-cargo text-red-600">Remove</button>
     </div>
@@ -196,6 +217,8 @@ function createCargoItem(index) {
 
   return wrapper;
 }
+
+
 function addCargoItem() {
   cargoItemsEl.appendChild(createCargoItem(cargoIndex));
   cargoIndex++;
