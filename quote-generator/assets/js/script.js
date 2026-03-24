@@ -96,7 +96,7 @@ const cargoItemsEl = document.getElementById("cargoItems");
 const addCargoBtn = document.getElementById("addCargoBtn");
 let cargoIndex = 0;
 
-function createCargoItem(index) {
+function createCargoItem(index) console.log("NEW UI LOADED"); {
   console.log("NEW UI LOADED");
   const wrapper = document.createElement("div");
   wrapper.className = "bg-white border rounded-xl p-5";
