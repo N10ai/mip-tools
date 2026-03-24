@@ -234,6 +234,24 @@ console.error("Failed to load locations JSON", err)
                 <button type="button" class="toggle-btn" data-group="tradeDirection" data-value="export">Export</button>
               </div>
             </div>
+            <!-- Bonded / FTZ -->
+<div id="bondedFtZWrap" class="mt-4">
+  <label class="label">Service Type</label>
+
+  <div class="flex flex-wrap gap-6 items-center text-sm">
+    
+    <label class="flex items-center gap-2 cursor-pointer">
+      <input type="checkbox" id="isBonded" class="h-4 w-4 accent-[#0f6fa6]">
+      <span>Bonded</span>
+    </label>
+
+    <label class="flex items-center gap-2 cursor-pointer">
+      <input type="checkbox" id="isFTZ" class="h-4 w-4 accent-[#0f6fa6]">
+      <span>FTZ</span>
+    </label>
+
+  </div>
+</div>
 
             <div id="loadTypeWrap" class="hidden">
               <label class="label">Load Type</label>
@@ -381,6 +399,22 @@ console.error("Failed to load locations JSON", err)
           </div>
 
           <div id="cargoItems" class="space-y-4"></div>
+          <!-- Shipment Totals -->
+<div id="cargoTotals" class="bg-white border border-[#e2d4c8] rounded-xl p-4 text-sm mt-4">
+  <div class="font-semibold text-[#0f6fa6] mb-2">Shipment Totals</div>
+
+  <div class="text-[#8a6247]" id="totalVolume">
+    Total Volume: —
+  </div>
+
+  <div class="text-[#8a6247]" id="totalVolumetricWeight">
+    Total Volumetric Weight: —
+  </div>
+
+  <div class="text-[#111827] font-semibold" id="totalChargeableWeight">
+    Total Chargeable Weight: —
+  </div>
+</div>
 
           <button
             type="button"
@@ -807,17 +841,9 @@ document.addEventListener("DOMContentLoaded", ()=>{
       weightUnitEl.dataset.prevUnit = weightUnitEl.value;
       dimUnitEl.dataset.prevUnit = dimUnitEl.value;
 
-      wrapper.addEventListener("input", (e) => {
-        if (
-          e.target.classList.contains("cargo-weight") ||
-          e.target.classList.contains("cargo-length") ||
-          e.target.classList.contains("cargo-width") ||
-          e.target.classList.contains("cargo-height") ||
-          e.target.classList.contains("cargo-qty")
-        ) {
-          recalcCargo(wrapper);
-        }
-      });
+      wrapper.addEventListener("input", () => {
+  recalcAllCargo();
+});
 
       weightUnitEl.addEventListener("change", () => {
         const weightInput = wrapper.querySelector(".cargo-weight");
@@ -927,9 +953,72 @@ document.addEventListener("DOMContentLoaded", ()=>{
     }
 
     function recalcAllCargo() {
-      cargoItemsEl.querySelectorAll("[data-index]").forEach(recalcCargo);
+
+  let totalVolume = 0
+  let totalVolumetric = 0
+  let totalChargeable = 0
+
+  cargoItemsEl.querySelectorAll("[data-index]").forEach(wrapper => {
+
+    const qty = parseFloat(wrapper.querySelector(".cargo-qty").value) || 0
+    const weight = parseFloat(wrapper.querySelector(".cargo-weight").value) || 0
+    const weightUnit = wrapper.querySelector(".cargo-weight-unit").value
+
+    let length = parseFloat(wrapper.querySelector(".cargo-length").value) || 0
+    let width = parseFloat(wrapper.querySelector(".cargo-width").value) || 0
+    let height = parseFloat(wrapper.querySelector(".cargo-height").value) || 0
+    const dimUnit = wrapper.querySelector(".cargo-dim-unit").value
+
+    let actualWeightKg = weightUnit === "lbs" ? weight / 2.20462 : weight
+
+    let lCm = dimUnit === "inch" ? length * 2.54 : length
+    let wCm = dimUnit === "inch" ? width * 2.54 : width
+    let hCm = dimUnit === "inch" ? height * 2.54 : height
+
+    const cbm = (lCm * wCm * hCm) / 1000000
+    const totalCbm = cbm * qty
+
+    let volumetricWeightKg = 0
+
+    if (state.transportMode === "air") {
+      volumetricWeightKg = ((lCm * wCm * hCm) / 6000) * qty
+    } else if (state.transportMode === "ground") {
+      volumetricWeightKg = ((lCm * wCm * hCm) / 5000) * qty
+    } else {
+      volumetricWeightKg = totalCbm * 1000
     }
 
+    const totalActualWeightKg = actualWeightKg * qty
+    const chargeableKg = Math.max(totalActualWeightKg, volumetricWeightKg)
+
+    // ACCUMULATE TOTALS
+    totalVolume += totalCbm
+    totalVolumetric += volumetricWeightKg
+    totalChargeable += chargeableKg
+
+    // UPDATE EACH ITEM DISPLAY
+    wrapper.querySelector(".cargo-volume").textContent =
+      `Volume: ${totalCbm.toFixed(3)} CBM`
+
+    wrapper.querySelector(".cargo-volumetric").textContent =
+      `Volumetric Weight: ${volumetricWeightKg.toFixed(2)} kg`
+
+    wrapper.querySelector(".cargo-chargeable").textContent =
+      `Chargeable Weight: ${chargeableKg.toFixed(2)} kg`
+
+  })
+
+  // UPDATE TOTALS UI
+  document.getElementById("totalVolume").textContent =
+    `Total Volume: ${totalVolume.toFixed(3)} CBM`
+
+  document.getElementById("totalVolumetricWeight").textContent =
+    `Total Volumetric Weight: ${totalVolumetric.toFixed(2)} kg`
+
+  document.getElementById("totalChargeableWeight").textContent =
+    `Total Chargeable Weight: ${totalChargeable.toFixed(2)} kg`
+
+}
     addCargoBtn.addEventListener("click", addCargoItem);
     addCargoItem();
     syncConditionalSections();
