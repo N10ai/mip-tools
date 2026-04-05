@@ -1,428 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="stylesheet" href="mip-tools/style.css">
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MIP Cargo Instant Quote</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIP Quote Portal</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
 
-  
+<style>
+  body {
+    background: radial-gradient(circle at 20% 20%, #0f172a, #020617);
+    color: #e5e7eb;
+    font-family: Inter, sans-serif;
+  }
+
+  .glass {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .glow {
+    box-shadow: 0 0 25px rgba(59,130,246,0.25);
+  }
+
+  .input {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: 0.2s;
+  }
+
+  .input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 10px rgba(59,130,246,0.5);
+    outline: none;
+  }
+
+  .tab-active {
+    background: rgba(59,130,246,0.2);
+    border: 1px solid rgba(59,130,246,0.4);
+  }
+
+</style>
 </head>
 
-  
-<script src="mip-tools/script.js" defer></script>
- 
-  <body>
-  <!-- Header -->
-  <header class="bg-[#07163d] text-white shadow-md">
-    <div class="max-w-6xl mx-auto px-4 py-5 flex flex-col items-center justify-center">
-      <img
-        src="https://images.fillout.com/orgid-278758/flowpublicid-sq68cpvhvb/widgetid-default/vLdctMaEwcPZsqqgYeQmyE/pasted-image-1773071890634.png"
-        alt="MIP Cargo Express"
-        class="h-16 w-16 rounded-full object-cover mb-2"
-      />
-      <div class="text-sm font-semibold flex items-center gap-2 opacity-90">
-        ✉ pricing@mipcargoexp.com
-      </div>
-    </div>
-  </header>
+<body class="p-6">
 
-  <!-- Hero -->
-  <section class="bg-[#e7edf2] border-b border-[#dfe5ea] py-14 px-4">
-    <div class="max-w-6xl mx-auto text-center">
-      <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900">
-        Instant Freight Quotes
-      </h1>
-      <p class="text-[#8a6247] text-lg mt-4">
-        Get competitive shipping rates - No sign-up required.
-      </p>
+<form id="quoteForm">
 
-      <div class="mt-10 flex flex-col sm:flex-row justify-center gap-6">
-        <div class="feature-card card-shadow flex items-center gap-4">
-          <div class="mini-icon">🚚</div>
-          <div class="text-left">
-            <div class="font-bold text-lg">Fast Delivery</div>
-            <div class="text-[#8a6247]">Express & standard options</div>
-          </div>
-        </div>
+<!-- HEADER -->
+<div class="flex justify-between items-center mb-6">
 
-        <div class="feature-card card-shadow flex items-center gap-4">
-          <div class="mini-icon">🌐</div>
-          <div class="text-left">
-            <div class="font-bold text-lg">Worldwide</div>
-            <div class="text-[#8a6247]">200+ countries covered</div>
-          </div>
-        </div>
-
-        <div class="feature-card card-shadow flex items-center gap-4">
-          <div class="mini-icon">🛡</div>
-          <div class="text-left">
-            <div class="font-bold text-lg">Insured Cargo</div>
-            <div class="text-[#8a6247]">Full cargo protection</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Main -->
-  <main class="max-w-5xl mx-auto px-4 py-10">
-    <div class="bg-[#fbfaf7] rounded-[24px] border border-[#e3d6ca] p-6 md:p-10 card-shadow">
-      <h2 class="text-2xl font-extrabold text-slate-900">Request a Quote</h2>
-      <p class="text-[#8a6247] mt-2 text-base leading-relaxed">
-        Fill in your shipment details below.<br>
-        (After you submit your request, you will receive a confirmation email with your reference Number)
-      </p>
-
-      <form id="quoteForm" class="space-y-6 mt-8">
-        <!-- Quote Details -->
-        <section class="soft-card p-5 card-shadow">
-          <div class="section-title">
-            <span>#</span>
-            <span>Quote Details</span>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="label">Reference Number (optional)</label>
-              <input class="field" name="referenceNumber" placeholder="e.g. PO-2024-001">
-            </div>
-            <div>
-              <label class="label">Email Address</label>
-              <input class="field" name="email" type="email" required placeholder="you@example.com">
-            </div>
-          </div>
-        </section>
-
-        <!-- Service Configuration -->
-        <section class="soft-card p-5 card-shadow">
-          <div class="section-title">
-            <span>⚙</span>
-            <span>Service Configuration</span>
-          </div>
-
-          <div class="space-y-4">
-            <div>
-              <label class="label">Transport Mode</label>
-              <div class="flex flex-wrap gap-2">
-                <button type="button" class="toggle-btn active" data-group="transportMode" data-value="air">✈ Air</button>
-                <button type="button" class="toggle-btn" data-group="transportMode" data-value="ocean">🚢 Ocean</button>
-                <button type="button" class="toggle-btn" data-group="transportMode" data-value="ground">🚚 Ground</button>
-              </div>
-            </div>
-
-            <div id="tradeDirectionWrap">
-              <label class="label">Trade Direction</label>
-              <div class="flex flex-wrap gap-2">
-                <button type="button" class="toggle-btn active" data-group="tradeDirection" data-value="import">Import</button>
-                <button type="button" class="toggle-btn" data-group="tradeDirection" data-value="export">Export</button>
-              </div>
-            </div>
-            <!-- Bonded / FTZ -->
-<div id="bondedFtZWrap" class="mt-4">
-  <label class="label">Service Type</label>
-
-  <div class="flex flex-wrap gap-6 items-center text-sm">
-    
-    <label class="flex items-center gap-2 cursor-pointer">
-      <input type="checkbox" id="isBonded" class="h-4 w-4 accent-[#0f6fa6]">
-      <span>Bonded</span>
-    </label>
-
-    <label class="flex items-center gap-2 cursor-pointer">
-      <input type="checkbox" id="isFTZ" class="h-4 w-4 accent-[#0f6fa6]">
-      <span>FTZ</span>
-    </label>
-
+  <div class="flex items-center gap-3">
+    <img src="https://via.placeholder.com/40" class="h-8">
+    <h1 class="text-lg font-semibold">MIP Quote Portal</h1>
   </div>
+
+  <!-- AI BUTTON -->
+  <button type="button" id="aiFill"
+    class="glass px-4 py-2 rounded-lg hover:bg-white/10 transition">
+    AI Autofill
+  </button>
+
 </div>
 
-            <div id="loadTypeWrap" class="hidden">
-              <label class="label">Load Type</label>
-              <div class="flex flex-wrap gap-2">
-                <button type="button" class="toggle-btn active" data-group="loadType" data-value="lcl">LCL — Less than Container</button>
-                <button type="button" class="toggle-btn" data-group="loadType" data-value="fcl">FCL — Full Container</button>
-              </div>
-            </div>
-
-            <div id="containerTypeWrap" class="hidden">
-              <label class="label">Container Type</label>
-              <select id="containerType" class="field">
-                <option value="20GP">20GP</option>
-                <option value="40GP">40GP</option>
-                <option value="40HQ">40HQ</option>
-                <option value="45HQ">45HQ</option>
-              </select>
-            </div>
-          </div>
-        </section>
-
-        <!-- Route for Air / Ocean -->
-        <section id="routeAirOceanSection" class="soft-card p-5 card-shadow">
-          <div class="section-title">
-            <span>📍</span>
-            <span>Origin / Destination</span>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <section>
-              <div class="space-y-4">
-                <div>
-                  <label id="originCodeLabel" class="label">Origin Airport / Port Code</label>
-                  <input id="originCode" class="field" placeholder="e.g. MIA or CNSHA">
-                </div>
-                <div>
-                  <label id="originNameLabel" class="label">Origin Airport / Port Name</label>
-                  <input id="originName" class="field" placeholder="e.g. Miami International Airport / Port of Shanghai">
-                </div>
-                <div>
-                  <label class="label">Origin Country</label>
-                  <input id="originCountryManual" class="field" placeholder="e.g. United States">
-                </div>
-              </div>
-            </section>
-
-            <section>
-              <div class="space-y-4">
-                <div>
-                  <label id="destinationCodeLabel" class="label">Destination Airport / Port Code</label>
-                  <input id="destinationCode" class="field" placeholder="e.g. UIO or USMIA">
-                </div>
-                <div>
-                  <label id="destinationNameLabel" class="label">Destination Airport / Port Name</label>
-                  <input id="destinationName" class="field" placeholder="e.g. Mariscal Sucre Airport / Port of Miami">
-                </div>
-                <div>
-                  <label class="label">Destination Country</label>
-                  <input id="destinationCountryManual" class="field" placeholder="e.g. Ecuador">
-                </div>
-              </div>
-            </section>
-          </div>
-        </section>
-
-        <!-- Route for Ground -->
-        <section id="routeGroundSection" class="soft-card p-5 card-shadow hidden">
-          <div class="section-title">
-            <span>📍</span>
-            <span>Ground Route Addresses</span>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <section>
-              <div class="font-semibold mb-3">Origin Address</div>
-              <div class="space-y-4">
-                <div>
-                  <label class="label">Company / Contact Name</label>
-                  <input id="groundOriginCompany" class="field" placeholder="ABC Corp">
-                </div>
-                <div>
-                  <label class="label">Street Address</label>
-                  <input id="groundOriginAddress" class="field" placeholder="123 Main St">
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label class="label">City</label>
-                    <input id="groundOriginCity" class="field" placeholder="Miami">
-                  </div>
-                  <div>
-                    <label class="label">State</label>
-                    <input id="groundOriginState" class="field" placeholder="FL">
-                  </div>
-                  <div>
-                    <label class="label">ZIP Code</label>
-                    <input id="groundOriginZip" class="field" placeholder="33166">
-                  </div>
-                </div>
-                <div>
-                  <label class="label">Country</label>
-                  <input id="groundOriginCountry" class="field" placeholder="United States">
-                </div>
-              </div>
-            </section>
-
-            <section>
-              <div class="font-semibold mb-3">Destination Address</div>
-              <div class="space-y-4">
-                <div>
-                  <label class="label">Company / Contact Name</label>
-                  <input id="groundDestinationCompany" class="field" placeholder="XYZ Imports">
-                </div>
-                <div>
-                  <label class="label">Street Address</label>
-                  <input id="groundDestinationAddress" class="field" placeholder="456 Harbor Rd">
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label class="label">City</label>
-                    <input id="groundDestinationCity" class="field" placeholder="Orlando">
-                  </div>
-                  <div>
-                    <label class="label">State</label>
-                    <input id="groundDestinationState" class="field" placeholder="FL">
-                  </div>
-                  <div>
-                    <label class="label">ZIP Code</label>
-                    <input id="groundDestinationZip" class="field" placeholder="32801">
-                  </div>
-                </div>
-                <div>
-                  <label class="label">Country</label>
-                  <input id="groundDestinationCountry" class="field" placeholder="United States">
-                </div>
-              </div>
-            </section>
-          </div>
-        </section>
-
-        <!-- Cargo -->
-        <section class="soft-card p-5 card-shadow">
-          <div class="section-title">
-            <span>📦</span>
-            <span>Cargo Details</span>
-          </div>
-
-          <div id="cargoItems" class="space-y-4"></div>
-          <!-- Shipment Totals -->
-<div id="cargoTotals" class="bg-white border border-[#e2d4c8] rounded-xl p-4 text-sm mt-4">
-  <div class="font-semibold text-[#0f6fa6] mb-2">Shipment Totals</div>
-
-  <div class="text-[#8a6247]" id="totalVolume">
-    Total Volume: —
-  </div>
-
-  <div class="text-[#8a6247]" id="totalVolumetricWeight">
-    Total Volumetric Weight: —
-  </div>
-
-  <div class="text-[#111827] font-semibold" id="totalChargeableWeight">
-    Total Chargeable Weight: —
-  </div>
+<!-- TABS -->
+<div class="flex gap-3 mb-6">
+  <button type="button" class="tab tab-active px-4 py-2 rounded-full">Shipment</button>
+  <button type="button" class="tab px-4 py-2 rounded-full">Cargo</button>
+  <button type="button" class="tab px-4 py-2 rounded-full">Pickup</button>
+  <button type="button" class="tab px-4 py-2 rounded-full">Review</button>
 </div>
 
-          <button
-            type="button"
-            id="addCargoBtn"
-            class="w-full border border-dashed border-[#d9cbbb] rounded-lg py-2.5 text-sm font-medium hover:bg-white"
-          >
-            ＋ Add Another Item
-          </button>
-        </section>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        <!-- Inland Freight for Air/Ocean only -->
-        <section id="inlandAirOceanSection" class="soft-card p-5 card-shadow">
-          <div class="section-title">
-            <span>🚚</span>
-            <span>Inland Freight</span>
-          </div>
+  <!-- MAIN FORM -->
+  <div class="lg:col-span-2 glass p-6 rounded-2xl glow">
 
-          <label class="flex items-center gap-3 text-sm font-medium">
-            <input id="includeInlandFreight" type="checkbox" class="h-4 w-4">
-            <span>Include Pickup and Delivery Inland Transport</span>
-          </label>
+    <!-- SHIPMENT -->
+    <h2 class="text-lg mb-4">Shipment Details</h2>
 
-          <div id="inlandSection" class="hidden mt-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <section>
-                <div class="font-semibold mb-3">Pickup Address</div>
-                <div class="space-y-4">
-                  <div>
-                    <label class="label">Company / Contact Name</label>
-                    <input id="pickupCompany" class="field" placeholder="ABC Corp">
-                  </div>
-                  <div>
-                    <label class="label">Phone (optional)</label>
-                    <input id="pickupPhone" class="field" placeholder="+1 (555) 000-0000">
-                  </div>
-                  <div>
-                    <label class="label">Street Address</label>
-                    <input id="pickupAddress" class="field" placeholder="123 Main St">
-                  </div>
-                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label class="label">City</label>
-                      <input id="pickupCity" class="field" placeholder="Miami">
-                    </div>
-                    <div>
-                      <label class="label">State</label>
-                      <input id="pickupState" class="field" placeholder="FL">
-                    </div>
-                    <div>
-                      <label class="label">ZIP Code</label>
-                      <input id="pickupZip" class="field" placeholder="33166">
-                    </div>
-                  </div>
-                  <div>
-                    <label class="label">Country</label>
-                    <input id="pickupCountry" class="field" placeholder="United States">
-                  </div>
-                </div>
-              </section>
+    <div class="grid grid-cols-2 gap-4">
 
-              <section>
-                <div class="font-semibold mb-3">Delivery Address</div>
-                <div class="space-y-4">
-                  <div>
-                    <label class="label">Company / Contact Name</label>
-                    <input id="deliveryCompany" class="field" placeholder="XYZ Imports">
-                  </div>
-                  <div>
-                    <label class="label">Phone (optional)</label>
-                    <input id="deliveryPhone" class="field" placeholder="+1 (555) 000-0000">
-                  </div>
-                  <div>
-                    <label class="label">Street Address</label>
-                    <input id="deliveryAddress" class="field" placeholder="456 Harbor Rd">
-                  </div>
-                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label class="label">City</label>
-                      <input id="deliveryCity" class="field" placeholder="Orlando">
-                    </div>
-                    <div>
-                      <label class="label">State</label>
-                      <input id="deliveryState" class="field" placeholder="FL">
-                    </div>
-                    <div>
-                      <label class="label">ZIP Code</label>
-                      <input id="deliveryZip" class="field" placeholder="32801">
-                    </div>
-                  </div>
-                  <div>
-                    <label class="label">Country</label>
-                    <input id="deliveryCountry" class="field" placeholder="United States">
-                  </div>
-                </div>
-              </section>
-            </div>
+      <input class="input p-3 rounded-lg"
+        name="origin" placeholder="Origin (City / Airport)">
 
-            <div class="mt-4">
-              <label class="label">Special Instructions (optional)</label>
-              <input id="inlandNotes" class="field" placeholder="e.g. Call before arrival, loading dock available">
-            </div>
-          </div>
-        </section>
+      <input class="input p-3 rounded-lg"
+        name="destination" placeholder="Destination">
 
-        <button
-          type="submit"
-          class="w-full bg-[#0f6fa6] hover:bg-[#0c5e8d] text-white py-3.5 rounded-lg font-bold text-sm"
-        >
-          Get Instant Quote
-        </button>
-      </form>
+      <select class="input p-3 rounded-lg" name="mode">
+        <option value="">Mode</option>
+        <option>Air</option>
+        <option>Ocean</option>
+        <option>Ground</option>
+      </select>
 
-      <div id="statusBox" class="mt-6 hidden rounded-xl border border-[#d9cbbb] bg-white p-4"></div>
+      <select class="input p-3 rounded-lg" name="direction">
+        <option value="">Direction</option>
+        <option>Import</option>
+        <option>Export</option>
+      </select>
+
     </div>
-  </main>
 
-  <script>
- 
-  </script>
+    <!-- SERVICES -->
+    <div class="mt-6">
+      <h3 class="mb-3">Services</h3>
 
+      <div class="flex gap-3 flex-wrap">
 
+        <label class="glass px-4 py-2 rounded-full cursor-pointer">
+          <input type="checkbox" name="bonded" class="mr-2">
+          Bonded
+        </label>
+
+        <label class="glass px-4 py-2 rounded-full cursor-pointer">
+          <input type="checkbox" name="ftz" class="mr-2">
+          FTZ
+        </label>
+
+      </div>
+    </div>
+
+    <!-- CARGO -->
+    <div class="mt-8">
+      <h2 class="text-lg mb-4">Cargo Details</h2>
+
+      <div class="grid grid-cols-2 gap-4">
+
+        <input class="input p-3 rounded-lg"
+          name="qty" placeholder="Qty">
+
+        <input class="input p-3 rounded-lg"
+          name="weight" placeholder="Weight">
+
+        <input class="input p-3 rounded-lg"
+          name="length" placeholder="Length">
+
+        <input class="input p-3 rounded-lg"
+          name="width" placeholder="Width">
+
+        <input class="input p-3 rounded-lg"
+          name="height" placeholder="Height">
+
+        <input class="input p-3 rounded-lg"
+          name="commodity" placeholder="Commodity">
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="glass p-6 rounded-2xl sticky top-6 h-fit">
+
+    <h2 class="text-lg mb-4">Live Summary</h2>
+
+    <div class="text-sm space-y-2" id="summary">
+      <p>Origin: —</p>
+      <p>Destination: —</p>
+      <p>Mode: —</p>
+    </div>
+
+    <button type="submit"
+      class="w-full mt-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-500 transition glow">
+      Generate Quote
+    </button>
+
+  </div>
+
+</div>
+
+</form>
+
+<script>
+
+//////////////////////////////////////////////////
+// LIVE SUMMARY
+//////////////////////////////////////////////////
+
+const form = document.getElementById('quoteForm');
+
+form.addEventListener('input', () => {
+  const data = new FormData(form);
+
+  document.getElementById('summary').innerHTML = `
+    <p>Origin: ${data.get('origin') || '—'}</p>
+    <p>Destination: ${data.get('destination') || '—'}</p>
+    <p>Mode: ${data.get('mode') || '—'}</p>
+  `;
+});
+
+//////////////////////////////////////////////////
+// AI AUTOFILL
+//////////////////////////////////////////////////
+
+document.getElementById('aiFill').onclick = () => {
+
+  const aiData = {
+    origin: "Miami, FL",
+    destination: "New York, NY",
+    mode: "Air",
+    direction: "Export",
+    qty: "2",
+    weight: "120",
+    length: "48",
+    width: "40",
+    height: "45",
+    commodity: "Electronics"
+  };
+
+  for (let key in aiData) {
+    const field = document.querySelector(`[name="${key}"]`);
+    if (field) field.value = aiData[key];
+  }
+
+  form.dispatchEvent(new Event('input'));
+};
+
+//////////////////////////////////////////////////
+// FORM SUBMIT (KEEP YOUR EXISTING LOGIC HERE)
+//////////////////////////////////////////////////
+
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const data = new FormData(form);
+
+  // 👉 KEEP YOUR EXISTING WEBHOOK / PDF FUNCTION HERE
+  console.log(Object.fromEntries(data));
+
+  alert("Ready to connect with your webhook/PDF logic");
+});
+
+</script>
 
 </body>
 </html>
