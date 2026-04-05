@@ -541,9 +541,13 @@ fetch("https://n10ai.github.io/mip-tools/logistics-locations.json")
   .then(data => {
     locations = data;
     console.log("Locations loaded:", locations.length);
+
+    // ✅ attach AFTER data is ready
+    attachAutocomplete("originSearch", "origin");
+    attachAutocomplete("destinationSearch", "destination");
+
   })
   .catch(err => console.error("JSON load error:", err));
-
 function filterLocations(query, mode) {
   query = query.toLowerCase();
 
