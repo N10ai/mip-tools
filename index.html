@@ -536,7 +536,7 @@ updateShipmentUI();
 let locations = [];
 
 // LOAD JSON (make sure filename matches EXACTLY)
-fetch("logistics-locations.json")
+fetch("https://n10ai.github.io/mip-tools/logistics-locations.json")
   .then(res => res.json())
   .then(data => {
     locations = data;
