@@ -63,7 +63,7 @@ body {
 .intro-logo {
   transform: scale(0.7);
   opacity: 0;
-  animation: logoIn 2.4s ease forwards;
+  animation: logoIn 1.9s ease forwards;
 }
 
 .intro-text {
@@ -74,7 +74,7 @@ body {
 
 @keyframes logoIn {
   0% { opacity:0; transform:scale(0.7);}
-  60% { opacity:1; transform:scale(2.5);}
+  60% { opacity:1; transform:scale(2);}
   100% { transform:scale(1);}
 }
 
@@ -156,30 +156,81 @@ No back-and-forth. No delays.
 <!-- STEP 1 -->
 <div class="step active">
 
-<div class="grid grid-cols-2 gap-4">
-<input name="origin" class="input p-3 rounded-lg" placeholder="Origin">
-<input name="destination" class="input p-3 rounded-lg" placeholder="Destination">
-
-<select name="mode" class="input p-3 rounded-lg">
-<option value="">Mode</option>
-<option value="air">Air</option>
-<option value="ocean">Ocean</option>
-<option value="ground">Ground</option>
+<!-- MODE -->
+<select id="mode" name="mode" class="input p-3 rounded-lg w-full mb-4">
+  <option value="">Transport Mode</option>
+  <option value="air">✈ Air</option>
+  <option value="ocean">🚢 Ocean</option>
+  <option value="ground">🚚 Ground</option>
 </select>
 
-<select name="direction" class="input p-3 rounded-lg">
-<option value="">Direction</option>
-<option value="import">Import</option>
-<option value="export">Export</option>
-</select>
+<!-- AIR / OCEAN ROUTE -->
+<div id="airOceanFields">
+
+  <div class="grid grid-cols-2 gap-4">
+
+    <input name="originCode" class="input p-3 rounded-lg" placeholder="Origin Airport / Port Code">
+    <input name="destinationCode" class="input p-3 rounded-lg" placeholder="Destination Airport / Port Code">
+
+    <input name="originName" class="input p-3 rounded-lg" placeholder="Origin Airport / Port Name">
+    <input name="destinationName" class="input p-3 rounded-lg" placeholder="Destination Airport / Port Name">
+
+    <input name="originCountry" class="input p-3 rounded-lg" placeholder="Origin Country">
+    <input name="destinationCountry" class="input p-3 rounded-lg" placeholder="Destination Country">
+
+  </div>
+
 </div>
 
-<div class="mt-4 flex gap-4">
-<label><input type="checkbox" id="isBonded"> Bonded</label>
-<label><input type="checkbox" id="isFTZ"> FTZ</label>
+<!-- GROUND ROUTE -->
+<div id="groundFields" class="hidden">
+
+  <div class="grid grid-cols-2 gap-4">
+
+    <input name="originCity" class="input p-3 rounded-lg" placeholder="Origin City">
+    <input name="destinationCity" class="input p-3 rounded-lg" placeholder="Destination City">
+
+    <input name="originState" class="input p-3 rounded-lg" placeholder="Origin State">
+    <input name="destinationState" class="input p-3 rounded-lg" placeholder="Destination State">
+
+    <input name="originCountryGround" class="input p-3 rounded-lg" placeholder="Origin Country">
+    <input name="destinationCountryGround" class="input p-3 rounded-lg" placeholder="Destination Country">
+
+  </div>
+
 </div>
 
-<button type="button" class="next mt-6 bg-blue-600 px-4 py-2 rounded">Next</button>
+<!-- SERVICE -->
+<div id="serviceWrap" class="mt-5 hidden">
+
+  <select id="serviceType" name="serviceType" class="input p-3 rounded-lg w-full">
+    <option value="">Service Type</option>
+  </select>
+
+</div>
+
+<!-- CONTAINER (ONLY FCL) -->
+<div id="containerWrap" class="mt-4 hidden">
+
+  <select name="containerSize" class="input p-3 rounded-lg w-full">
+    <option value="">Container Size</option>
+    <option>20GP</option>
+    <option>40GP</option>
+    <option>40HQ</option>
+    <option>45HQ</option>
+  </select>
+
+</div>
+
+<!-- BONDED / FTZ -->
+<div class="mt-5 flex gap-4 text-sm">
+  <label><input type="checkbox" id="isBonded"> Bonded</label>
+  <label><input type="checkbox" id="isFTZ"> FTZ</label>
+</div>
+
+<button type="button" class="next mt-6 bg-blue-600 px-4 py-2 rounded">
+  Next
+</button>
 
 </div>
 
@@ -325,6 +376,82 @@ intro.style.opacity="0";
 setTimeout(()=>intro.style.display="none",600);
 },2200);
 };
+
+
+
+//SERVICE
+
+const modeEl = document.getElementById("mode");
+const serviceEl = document.getElementById("serviceType");
+
+const serviceWrap = document.getElementById("serviceWrap");
+const containerWrap = document.getElementById("containerWrap");
+
+const airOceanFields = document.getElementById("airOceanFields");
+const groundFields = document.getElementById("groundFields");
+
+function updateShipmentUI() {
+
+  const mode = modeEl.value;
+
+  // RESET
+  serviceWrap.classList.add("hidden");
+  containerWrap.classList.add("hidden");
+  serviceEl.innerHTML = '<option value="">Service Type</option>';
+
+  // SWITCH ROUTES
+  if (mode === "ground") {
+    airOceanFields.classList.add("hidden");
+    groundFields.classList.remove("hidden");
+  } else {
+    airOceanFields.classList.remove("hidden");
+    groundFields.classList.add("hidden");
+  }
+
+  // AIR
+  if (mode === "air") {
+    serviceWrap.classList.add("hidden"); // no service for air
+  }
+
+  // OCEAN
+  if (mode === "ocean") {
+    serviceWrap.classList.remove("hidden");
+
+    serviceEl.innerHTML += `
+      <option value="lcl">LCL</option>
+      <option value="fcl">FCL</option>
+    `;
+  }
+
+  // GROUND
+  if (mode === "ground") {
+    serviceWrap.classList.remove("hidden");
+
+    serviceEl.innerHTML += `
+      <option value="ltl">LTL</option>
+      <option value="ftl">FTL</option>
+    `;
+  }
+
+}
+
+// SHOW CONTAINER IF FCL
+serviceEl.addEventListener("change", () => {
+
+  if (serviceEl.value === "fcl") {
+    containerWrap.classList.remove("hidden");
+  } else {
+    containerWrap.classList.add("hidden");
+  }
+
+});
+
+// LISTENER
+modeEl.addEventListener("change", updateShipmentUI);
+
+// INIT
+updateShipmentUI();
+
 
 </script>
 
