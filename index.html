@@ -346,6 +346,10 @@ Submit Quote
 
 <script>
 
+<!-- ONLY SCRIPT PART CHANGED — EVERYTHING ELSE PRESERVED -->
+
+<script>
+
 // STEP SYSTEM
 let step = 0;
 const steps = document.querySelectorAll(".step");
@@ -468,12 +472,10 @@ function updateShipmentUI() {
 
   const mode = modeEl.value;
 
-  // RESET
   serviceWrap.classList.add("hidden");
   containerWrap.classList.add("hidden");
   serviceEl.innerHTML = '<option value="">Service Type</option>';
 
-  // SWITCH ROUTES
   if (mode === "ground") {
     airOceanFields.classList.add("hidden");
     groundFields.classList.remove("hidden");
@@ -482,25 +484,16 @@ function updateShipmentUI() {
     groundFields.classList.add("hidden");
   }
 
-  // AIR
-  if (mode === "air") {
-    serviceWrap.classList.add("hidden");
-  }
-
-  // OCEAN
   if (mode === "ocean") {
     serviceWrap.classList.remove("hidden");
-
     serviceEl.innerHTML += `
       <option value="lcl">LCL</option>
       <option value="fcl">FCL</option>
     `;
   }
 
-  // GROUND
   if (mode === "ground") {
     serviceWrap.classList.remove("hidden");
-
     serviceEl.innerHTML += `
       <option value="ltl">LTL</option>
       <option value="ftl">FTL</option>
@@ -510,60 +503,53 @@ function updateShipmentUI() {
   form.dispatchEvent(new Event("input"));
 }
 
-// SHOW CONTAINER IF FCL
 serviceEl.addEventListener("change", () => {
-
-  if (serviceEl.value === "fcl") {
-    containerWrap.classList.remove("hidden");
-  } else {
-    containerWrap.classList.add("hidden");
-  }
-
+  containerWrap.classList.toggle("hidden", serviceEl.value !== "fcl");
 });
 
-// LISTENER
 modeEl.addEventListener("change", updateShipmentUI);
-
-// INIT
 updateShipmentUI();
 
 
-
 //////////////////////////////////////////////////
-// LOCATION AUTOCOMPLETE json
+// ✅ FIXED AUTOCOMPLETE SYSTEM
 //////////////////////////////////////////////////
 
 let locations = [];
 
-// LOAD JSON (make sure filename matches EXACTLY)
 fetch("https://n10ai.github.io/mip-tools/logistics-locations.json")
   .then(res => res.json())
   .then(data => {
     locations = data;
-    console.log("Locations loaded:", locations.length);
+    console.log("✅ Locations loaded:", locations.length);
 
-    // ✅ attach AFTER data is ready
+    // attach ONLY AFTER data loads
     attachAutocomplete("originSearch", "origin");
     attachAutocomplete("destinationSearch", "destination");
-
   })
-  .catch(err => console.error("JSON load error:", err));
+  .catch(err => console.error("❌ JSON load error:", err));
+
 function filterLocations(query, mode) {
+
   query = query.toLowerCase();
 
-  return locations
-    .filter(loc => {
-      if (mode === "air") return loc.type === "airport";
-      if (mode === "ocean") return loc.type === "seaport";
-      return true;
-    })
-    .filter(loc =>
-      loc.code?.toLowerCase().includes(query) ||
-      loc.name?.toLowerCase().includes(query) ||
-      loc.city?.toLowerCase().includes(query) ||
-      loc.country?.toLowerCase().includes(query)
-    )
-    .slice(0, 6);
+  let results = locations.filter(loc =>
+    loc.code?.toLowerCase().includes(query) ||
+    loc.name?.toLowerCase().includes(query) ||
+    loc.city?.toLowerCase().includes(query) ||
+    loc.country?.toLowerCase().includes(query)
+  );
+
+  // prioritize instead of blocking
+  if (mode === "air") {
+    results = results.sort((a, b) => (b.type === "airport") - (a.type === "airport"));
+  }
+
+  if (mode === "ocean") {
+    results = results.sort((a, b) => (b.type === "seaport") - (a.type === "seaport"));
+  }
+
+  return results.slice(0, 6);
 }
 
 function attachAutocomplete(inputId, type) {
@@ -595,15 +581,12 @@ function attachAutocomplete(inputId, type) {
       const option = document.createElement("div");
       option.className = "p-2 cursor-pointer hover:bg-white/10";
 
-      option.innerHTML = `
-        <b>${loc.code}</b> — ${loc.city}, ${loc.country}
-      `;
+      option.innerHTML = `<b>${loc.code}</b> — ${loc.city}, ${loc.country}`;
 
       option.onclick = () => {
 
         input.value = `${loc.code} - ${loc.city}, ${loc.country}`;
 
-        // fill hidden fields
         if (type === "origin") {
           document.getElementById("originCode").value = loc.code;
           document.getElementById("originName").value = loc.name;
@@ -622,7 +605,7 @@ function attachAutocomplete(inputId, type) {
       dropdown.appendChild(option);
     });
 
-    dropdown.classList.remove("hidden");
+    dropdown.classList.toggle("hidden", results.length === 0);
   });
 
   document.addEventListener("click", (e) => {
@@ -632,9 +615,7 @@ function attachAutocomplete(inputId, type) {
   });
 }
 
-// INIT
-attachAutocomplete("originSearch", "origin");
-attachAutocomplete("destinationSearch", "destination");
+</script>
 
 
 
