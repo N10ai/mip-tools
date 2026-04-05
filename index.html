@@ -8,38 +8,51 @@
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
-  body {
-    background: radial-gradient(circle at 20% 20%, #0f172a, #020617);
-    color: #e5e7eb;
-    font-family: Inter, sans-serif;
-  }
+body {
+  background: radial-gradient(circle at 20% 20%, #0f172a, #020617);
+  color: #e5e7eb;
+  font-family: Inter, sans-serif;
+}
 
-  .glass {
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.1);
-  }
+.glass {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
 
-  .glow {
-    box-shadow: 0 0 25px rgba(59,130,246,0.25);
-  }
+.input {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color:white;
+}
 
-  .input {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    transition: 0.2s;
-  }
+.input:focus {
+  border-color:#3b82f6;
+  box-shadow:0 0 10px rgba(59,130,246,0.5);
+  outline:none;
+}
 
-  .input:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 10px rgba(59,130,246,0.5);
-    outline: none;
-  }
+.tab-active {
+  background: rgba(59,130,246,0.2);
+  border:1px solid rgba(59,130,246,0.4);
+}
 
-  .tab-active {
-    background: rgba(59,130,246,0.2);
-    border: 1px solid rgba(59,130,246,0.4);
-  }
+.step { display:none; }
+.step.active { display:block; }
+
+.progress-bar {
+  height:8px;
+  background:#1e293b;
+  border-radius:999px;
+  overflow:hidden;
+}
+
+.progress-fill {
+  height:100%;
+  background:#3b82f6;
+  width:25%;
+  transition:0.3s;
+}
 
 </style>
 </head>
@@ -50,124 +63,120 @@
 
 <!-- HEADER -->
 <div class="flex justify-between items-center mb-6">
+  <h1 class="text-lg font-semibold">MIP Quote Portal</h1>
 
-  <div class="flex items-center gap-3">
-    <img src="https://via.placeholder.com/40" class="h-8">
-    <h1 class="text-lg font-semibold">MIP Quote Portal</h1>
-  </div>
-
-  <!-- AI BUTTON -->
   <button type="button" id="aiFill"
-    class="glass px-4 py-2 rounded-lg hover:bg-white/10 transition">
+    class="glass px-4 py-2 rounded-lg hover:bg-white/10">
     AI Autofill
   </button>
-
 </div>
 
 <!-- TABS -->
-<div class="flex gap-3 mb-6">
-  <button type="button" class="tab tab-active px-4 py-2 rounded-full">Shipment</button>
-  <button type="button" class="tab px-4 py-2 rounded-full">Cargo</button>
-  <button type="button" class="tab px-4 py-2 rounded-full">Pickup</button>
-  <button type="button" class="tab px-4 py-2 rounded-full">Review</button>
+<div class="flex gap-3 mb-4">
+  <button type="button" class="tab tab-active px-4 py-2 rounded-full" data-step="0">Shipment</button>
+  <button type="button" class="tab px-4 py-2 rounded-full" data-step="1">Cargo</button>
+  <button type="button" class="tab px-4 py-2 rounded-full" data-step="2">Pickup</button>
+  <button type="button" class="tab px-4 py-2 rounded-full" data-step="3">Review</button>
+</div>
+
+<div class="progress-bar mb-6">
+  <div id="progress" class="progress-fill"></div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-  <!-- MAIN FORM -->
-  <div class="lg:col-span-2 glass p-6 rounded-2xl glow">
+<!-- LEFT -->
+<div class="lg:col-span-2 glass p-6 rounded-2xl">
 
-    <!-- SHIPMENT -->
-    <h2 class="text-lg mb-4">Shipment Details</h2>
+<!-- STEP 1 -->
+<div class="step active">
 
-    <div class="grid grid-cols-2 gap-4">
+<div class="grid grid-cols-2 gap-4">
 
-      <input class="input p-3 rounded-lg"
-        name="origin" placeholder="Origin (City / Airport)">
+<input name="origin" class="input p-3 rounded-lg" placeholder="Origin">
+<input name="destination" class="input p-3 rounded-lg" placeholder="Destination">
 
-      <input class="input p-3 rounded-lg"
-        name="destination" placeholder="Destination">
+<select name="mode" class="input p-3 rounded-lg">
+<option value="">Mode</option>
+<option value="air">Air</option>
+<option value="ocean">Ocean</option>
+<option value="ground">Ground</option>
+</select>
 
-      <select class="input p-3 rounded-lg" name="mode">
-        <option value="">Mode</option>
-        <option>Air</option>
-        <option>Ocean</option>
-        <option>Ground</option>
-      </select>
+<select name="direction" class="input p-3 rounded-lg">
+<option value="">Direction</option>
+<option value="import">Import</option>
+<option value="export">Export</option>
+</select>
 
-      <select class="input p-3 rounded-lg" name="direction">
-        <option value="">Direction</option>
-        <option>Import</option>
-        <option>Export</option>
-      </select>
+</div>
 
-    </div>
+<div class="mt-4 flex gap-4">
+<label><input type="checkbox" id="isBonded"> Bonded</label>
+<label><input type="checkbox" id="isFTZ"> FTZ</label>
+</div>
 
-    <!-- SERVICES -->
-    <div class="mt-6">
-      <h3 class="mb-3">Services</h3>
+<button type="button" class="next mt-6 bg-blue-600 px-4 py-2 rounded">Next</button>
 
-      <div class="flex gap-3 flex-wrap">
+</div>
 
-        <label class="glass px-4 py-2 rounded-full cursor-pointer">
-          <input type="checkbox" name="bonded" class="mr-2">
-          Bonded
-        </label>
+<!-- STEP 2 -->
+<div class="step">
 
-        <label class="glass px-4 py-2 rounded-full cursor-pointer">
-          <input type="checkbox" name="ftz" class="mr-2">
-          FTZ
-        </label>
+<div id="cargoItems"></div>
 
-      </div>
-    </div>
+<button type="button" id="addCargo" class="mt-4 bg-blue-600 px-4 py-2 rounded">
++ Add Cargo
+</button>
 
-    <!-- CARGO -->
-    <div class="mt-8">
-      <h2 class="text-lg mb-4">Cargo Details</h2>
+<div id="totals" class="mt-4 text-sm"></div>
 
-      <div class="grid grid-cols-2 gap-4">
+<div class="flex justify-between mt-6">
+<button type="button" class="prev">Back</button>
+<button type="button" class="next bg-blue-600 px-4 py-2 rounded">Next</button>
+</div>
 
-        <input class="input p-3 rounded-lg"
-          name="qty" placeholder="Qty">
+</div>
 
-        <input class="input p-3 rounded-lg"
-          name="weight" placeholder="Weight">
+<!-- STEP 3 -->
+<div class="step">
 
-        <input class="input p-3 rounded-lg"
-          name="length" placeholder="Length">
+<label><input type="checkbox" id="includeInland"> Include Inland</label>
 
-        <input class="input p-3 rounded-lg"
-          name="width" placeholder="Width">
+<div id="inlandFields" class="hidden mt-4">
 
-        <input class="input p-3 rounded-lg"
-          name="height" placeholder="Height">
+<input id="pickupCompany" class="input p-3 rounded mb-2" placeholder="Pickup Company">
+<input id="deliveryCompany" class="input p-3 rounded" placeholder="Delivery Company">
 
-        <input class="input p-3 rounded-lg"
-          name="commodity" placeholder="Commodity">
+</div>
 
-      </div>
-    </div>
+<div class="flex justify-between mt-6">
+<button type="button" class="prev">Back</button>
+<button type="button" class="next bg-blue-600 px-4 py-2 rounded">Next</button>
+</div>
 
-  </div>
+</div>
 
-  <!-- SUMMARY -->
-  <div class="glass p-6 rounded-2xl sticky top-6 h-fit">
+<!-- STEP 4 -->
+<div class="step">
 
-    <h2 class="text-lg mb-4">Live Summary</h2>
+<div id="review"></div>
 
-    <div class="text-sm space-y-2" id="summary">
-      <p>Origin: —</p>
-      <p>Destination: —</p>
-      <p>Mode: —</p>
-    </div>
+<button type="submit" class="mt-6 w-full bg-blue-600 py-3 rounded">
+Submit Quote
+</button>
 
-    <button type="submit"
-      class="w-full mt-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-500 transition glow">
-      Generate Quote
-    </button>
+</div>
 
-  </div>
+</div>
+
+<!-- RIGHT SUMMARY -->
+<div class="glass p-6 rounded-2xl">
+
+<h2 class="mb-4">Live Summary</h2>
+<div id="summary" class="text-sm space-y-2"></div>
+
+</div>
 
 </div>
 
@@ -176,62 +185,110 @@
 <script>
 
 //////////////////////////////////////////////////
-// LIVE SUMMARY
+// STEP SYSTEM
 //////////////////////////////////////////////////
 
-const form = document.getElementById('quoteForm');
+let step = 0;
+const steps = document.querySelectorAll(".step");
 
-form.addEventListener('input', () => {
+function showStep(i){
+  step = i;
+
+  steps.forEach((s,idx)=>s.classList.toggle("active", idx===i));
+
+  document.querySelectorAll(".tab").forEach((t,idx)=>{
+    t.classList.toggle("tab-active", idx===i);
+  });
+
+  document.getElementById("progress").style.width = ((i+1)/4*100)+"%";
+}
+
+document.querySelectorAll(".next").forEach(btn=>{
+  btn.onclick = ()=>showStep(step+1);
+});
+
+document.querySelectorAll(".prev").forEach(btn=>{
+  btn.onclick = ()=>showStep(step-1);
+});
+
+document.querySelectorAll(".tab").forEach(tab=>{
+  tab.onclick = ()=>showStep(Number(tab.dataset.step));
+});
+
+//////////////////////////////////////////////////
+// CARGO SYSTEM
+//////////////////////////////////////////////////
+
+let cargoIndex = 0;
+const cargoEl = document.getElementById("cargoItems");
+
+function addCargo(){
+  const div = document.createElement("div");
+  div.className="mb-4";
+
+  div.innerHTML = `
+  <input class="input p-2 mb-1 qty" placeholder="Qty">
+  <input class="input p-2 mb-1 weight" placeholder="Weight">
+  <input class="input p-2 mb-1 length" placeholder="Length">
+  <input class="input p-2 mb-1 width" placeholder="Width">
+  <input class="input p-2 mb-1 height" placeholder="Height">
+  `;
+
+  cargoEl.appendChild(div);
+}
+
+document.getElementById("addCargo").onclick = addCargo;
+
+//////////////////////////////////////////////////
+// SUMMARY
+//////////////////////////////////////////////////
+
+const form = document.getElementById("quoteForm");
+
+form.addEventListener("input", ()=>{
   const data = new FormData(form);
 
-  document.getElementById('summary').innerHTML = `
-    <p>Origin: ${data.get('origin') || '—'}</p>
-    <p>Destination: ${data.get('destination') || '—'}</p>
-    <p>Mode: ${data.get('mode') || '—'}</p>
+  document.getElementById("summary").innerHTML = `
+  <p>Origin: ${data.get("origin")||"-"}</p>
+  <p>Destination: ${data.get("destination")||"-"}</p>
+  <p>Mode: ${data.get("mode")||"-"}</p>
   `;
 });
 
 //////////////////////////////////////////////////
-// AI AUTOFILL
+// AI
 //////////////////////////////////////////////////
 
-document.getElementById('aiFill').onclick = () => {
-
-  const aiData = {
-    origin: "Miami, FL",
-    destination: "New York, NY",
-    mode: "Air",
-    direction: "Export",
-    qty: "2",
-    weight: "120",
-    length: "48",
-    width: "40",
-    height: "45",
-    commodity: "Electronics"
-  };
-
-  for (let key in aiData) {
-    const field = document.querySelector(`[name="${key}"]`);
-    if (field) field.value = aiData[key];
-  }
-
-  form.dispatchEvent(new Event('input'));
+document.getElementById("aiFill").onclick = ()=>{
+  document.querySelector('[name="origin"]').value="Miami";
+  document.querySelector('[name="destination"]').value="NYC";
+  form.dispatchEvent(new Event("input"));
 };
 
 //////////////////////////////////////////////////
-// FORM SUBMIT (KEEP YOUR EXISTING LOGIC HERE)
+// INLAND TOGGLE
 //////////////////////////////////////////////////
 
-form.addEventListener('submit', function(e) {
+document.getElementById("includeInland").onchange = e=>{
+  document.getElementById("inlandFields").classList.toggle("hidden", !e.target.checked);
+};
+
+//////////////////////////////////////////////////
+// SUBMIT
+//////////////////////////////////////////////////
+
+form.onsubmit = async (e)=>{
   e.preventDefault();
 
-  const data = new FormData(form);
+  const payload = Object.fromEntries(new FormData(form));
 
-  // 👉 KEEP YOUR EXISTING WEBHOOK / PDF FUNCTION HERE
-  console.log(Object.fromEntries(data));
+  payload.isBonded = document.getElementById("isBonded").checked;
+  payload.isFTZ = document.getElementById("isFTZ").checked;
 
-  alert("Ready to connect with your webhook/PDF logic");
-});
+  console.log(payload);
+
+  alert("Ready to connect webhook");
+};
 
 </script>
 
