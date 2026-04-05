@@ -54,7 +54,7 @@ body {
   transition:0.3s;
 }
 
-/* INTRO ANIMATION */
+/* INTRO */
 
 #introScreen {
   transition: opacity 0.6s ease, visibility 0.6s;
@@ -63,7 +63,7 @@ body {
 .intro-logo {
   transform: scale(0.7);
   opacity: 0;
-  animation: logoIn 1.2s ease forwards;
+  animation: logoIn 1.4s ease forwards;
 }
 
 .intro-text {
@@ -73,72 +73,79 @@ body {
 }
 
 @keyframes logoIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.7);
-  }
-  60% {
-    opacity: 1;
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
-  }
+  0% { opacity:0; transform:scale(0.7);}
+  60% { opacity:1; transform:scale(1.8);}
+  100% { transform:scale(1);}
 }
 
 @keyframes textIn {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  to { opacity:1; transform:translateY(0);}
 }
-
-
-
 </style>
 </head>
 
 <body class="p-6">
-<!-- INTRO SCREEN -->
+
+<!-- INTRO -->
 <div id="introScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black">
 
 <img 
-  src="https://raw.githubusercontent.com/N10ai/mip-tools/main/Untitled%20design%20-%201.png"
-  class="w-24 h-24 mb-6 intro-logo object-contain"
+src="https://raw.githubusercontent.com/N10ai/mip-tools/main/Untitled%20design%20-%201.png"
+class="w-24 h-24 mb-6 intro-logo object-contain"
 />
 
-  <div class="text-lg tracking-wide text-white opacity-0 intro-text">
-    Smart Logistics. Faster Decisions.
-  </div>
+<div class="text-lg tracking-wide text-white opacity-0 intro-text">
+Smart Logistics. Faster Decisions.
+</div>
 
 </div>
 
 <form id="quoteForm">
 
 <!-- HEADER -->
-<div class="flex items-center">
-  <img 
-    src="https://raw.githubusercontent.com/N10ai/mip-tools/main/Untitled%20design%20-%201.png"
-    class="h-10 object-contain"
-  >
+<div class="flex justify-between items-center mb-8">
+
+<div class="flex items-center gap-3">
+<img src="https://raw.githubusercontent.com/N10ai/mip-tools/main/Untitled%20design%20-%201.png"
+class="h-14 object-contain drop-shadow-xl">
+
+<div>
+<div class="text-lg font-semibold">MIP Cargo</div>
+<div class="text-xs text-gray-400">Instant Quote Portal</div>
+</div>
 </div>
 
-  <button type="button" id="aiFill"
-    class="glass px-4 py-2 rounded-lg hover:bg-white/10">
-    AI Autofill
-  </button>
+<button type="button" id="aiFill"
+class="px-5 py-2.5 rounded-lg text-sm font-semibold
+bg-gradient-to-r from-blue-500 to-indigo-500
+hover:from-blue-400 hover:to-indigo-400
+text-white shadow-lg shadow-blue-500/30 transition">
+⚡ Autofill with AI
+</button>
+
+</div>
+
+<!-- HERO -->
+<div class="mb-6">
+<h2 class="text-2xl font-semibold mb-2">
+Get your freight quote in seconds
+</h2>
+<p class="text-sm text-gray-400 max-w-xl">
+Enter shipment details or use AI Autofill to instantly structure your quote.
+No back-and-forth. No delays.
+</p>
 </div>
 
 <!-- TABS -->
 <div class="flex gap-3 mb-4">
-  <button type="button" class="tab tab-active px-4 py-2 rounded-full" data-step="0">Shipment</button>
-  <button type="button" class="tab px-4 py-2 rounded-full" data-step="1">Cargo</button>
-  <button type="button" class="tab px-4 py-2 rounded-full" data-step="2">Pickup</button>
-  <button type="button" class="tab px-4 py-2 rounded-full" data-step="3">Review</button>
+<button type="button" class="tab tab-active px-4 py-2 rounded-full" data-step="0">Shipment</button>
+<button type="button" class="tab px-4 py-2 rounded-full" data-step="1">Cargo</button>
+<button type="button" class="tab px-4 py-2 rounded-full" data-step="2">Pickup</button>
+<button type="button" class="tab px-4 py-2 rounded-full" data-step="3">Review</button>
 </div>
 
 <div class="progress-bar mb-6">
-  <div id="progress" class="progress-fill"></div>
+<div id="progress" class="progress-fill"></div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -150,7 +157,6 @@ body {
 <div class="step active">
 
 <div class="grid grid-cols-2 gap-4">
-
 <input name="origin" class="input p-3 rounded-lg" placeholder="Origin">
 <input name="destination" class="input p-3 rounded-lg" placeholder="Destination">
 
@@ -166,7 +172,6 @@ body {
 <option value="import">Import</option>
 <option value="export">Export</option>
 </select>
-
 </div>
 
 <div class="mt-4 flex gap-4">
@@ -202,10 +207,8 @@ body {
 <label><input type="checkbox" id="includeInland"> Include Inland</label>
 
 <div id="inlandFields" class="hidden mt-4">
-
 <input id="pickupCompany" class="input p-3 rounded mb-2" placeholder="Pickup Company">
 <input id="deliveryCompany" class="input p-3 rounded" placeholder="Delivery Company">
-
 </div>
 
 <div class="flex justify-between mt-6">
@@ -228,149 +231,100 @@ Submit Quote
 
 </div>
 
-<!-- RIGHT SUMMARY -->
+<!-- RIGHT -->
 <div class="glass p-6 rounded-2xl">
-
 <h2 class="mb-4">Live Summary</h2>
 <div id="summary" class="text-sm space-y-2"></div>
-
 </div>
 
 </div>
-
 </form>
 
 <script>
 
-//////////////////////////////////////////////////
 // STEP SYSTEM
-//////////////////////////////////////////////////
-
 let step = 0;
 const steps = document.querySelectorAll(".step");
 
 function showStep(i){
-  step = i;
+step = i;
 
-  steps.forEach((s,idx)=>s.classList.toggle("active", idx===i));
+steps.forEach((s,idx)=>s.classList.toggle("active", idx===i));
 
-  document.querySelectorAll(".tab").forEach((t,idx)=>{
-    t.classList.toggle("tab-active", idx===i);
-  });
+document.querySelectorAll(".tab").forEach((t,idx)=>{
+t.classList.toggle("tab-active", idx===i);
+});
 
-  document.getElementById("progress").style.width = ((i+1)/4*100)+"%";
+document.getElementById("progress").style.width = ((i+1)/4*100)+"%";
 }
 
 document.querySelectorAll(".next").forEach(btn=>{
-  btn.onclick = ()=>showStep(step+1);
+btn.onclick = ()=>showStep(step+1);
 });
 
 document.querySelectorAll(".prev").forEach(btn=>{
-  btn.onclick = ()=>showStep(step-1);
+btn.onclick = ()=>showStep(step-1);
 });
 
 document.querySelectorAll(".tab").forEach(tab=>{
-  tab.onclick = ()=>showStep(Number(tab.dataset.step));
+tab.onclick = ()=>showStep(Number(tab.dataset.step));
 });
 
-//////////////////////////////////////////////////
-// CARGO SYSTEM
-//////////////////////////////////////////////////
+// CARGO
+document.getElementById("addCargo").onclick = ()=>{
+const div = document.createElement("div");
+div.className="mb-4";
 
-let cargoIndex = 0;
-const cargoEl = document.getElementById("cargoItems");
+div.innerHTML=`
+<input class="input p-2 mb-1 qty" placeholder="Qty">
+<input class="input p-2 mb-1 weight" placeholder="Weight">
+<input class="input p-2 mb-1 length" placeholder="Length">
+<input class="input p-2 mb-1 width" placeholder="Width">
+<input class="input p-2 mb-1 height" placeholder="Height">
+`;
 
-function addCargo(){
-  const div = document.createElement("div");
-  div.className="mb-4";
+document.getElementById("cargoItems").appendChild(div);
+};
 
-  div.innerHTML = `
-  <input class="input p-2 mb-1 qty" placeholder="Qty">
-  <input class="input p-2 mb-1 weight" placeholder="Weight">
-  <input class="input p-2 mb-1 length" placeholder="Length">
-  <input class="input p-2 mb-1 width" placeholder="Width">
-  <input class="input p-2 mb-1 height" placeholder="Height">
-  `;
-
-  cargoEl.appendChild(div);
-}
-
-document.getElementById("addCargo").onclick = addCargo;
-
-//////////////////////////////////////////////////
 // SUMMARY
-//////////////////////////////////////////////////
+const form=document.getElementById("quoteForm");
 
-const form = document.getElementById("quoteForm");
+form.addEventListener("input",()=>{
+const data=new FormData(form);
 
-form.addEventListener("input", ()=>{
-  const data = new FormData(form);
-
-  document.getElementById("summary").innerHTML = `
-  <p>Origin: ${data.get("origin")||"-"}</p>
-  <p>Destination: ${data.get("destination")||"-"}</p>
-  <p>Mode: ${data.get("mode")||"-"}</p>
-  `;
+document.getElementById("summary").innerHTML=`
+<p>Origin: ${data.get("origin")||"-"}</p>
+<p>Destination: ${data.get("destination")||"-"}</p>
+<p>Mode: ${data.get("mode")||"-"}</p>
+`;
 });
 
-//////////////////////////////////////////////////
 // AI
-//////////////////////////////////////////////////
-
-document.getElementById("aiFill").onclick = ()=>{
-  document.querySelector('[name="origin"]').value="Miami";
-  document.querySelector('[name="destination"]').value="NYC";
-  form.dispatchEvent(new Event("input"));
+document.getElementById("aiFill").onclick=()=>{
+document.querySelector('[name="origin"]').value="Miami";
+document.querySelector('[name="destination"]').value="NYC";
+form.dispatchEvent(new Event("input"));
 };
 
-//////////////////////////////////////////////////
-// INLAND TOGGLE
-//////////////////////////////////////////////////
-
-document.getElementById("includeInland").onchange = e=>{
-  document.getElementById("inlandFields").classList.toggle("hidden", !e.target.checked);
+// INLAND
+document.getElementById("includeInland").onchange=e=>{
+document.getElementById("inlandFields").classList.toggle("hidden", !e.target.checked);
 };
 
-//////////////////////////////////////////////////
 // SUBMIT
-//////////////////////////////////////////////////
-
-form.onsubmit = async (e)=>{
-  e.preventDefault();
-
-  const payload = Object.fromEntries(new FormData(form));
-
-  payload.isBonded = document.getElementById("isBonded").checked;
-  payload.isFTZ = document.getElementById("isFTZ").checked;
-
-  console.log(payload);
-
-  alert("Ready to connect webhook");
+form.onsubmit=(e)=>{
+e.preventDefault();
+alert("Ready to connect webhook");
 };
 
-
-//////////////////////////////////////////////////
-// INTRO SCREEN CONTROL
-//////////////////////////////////////////////////
-
-window.addEventListener("load", () => {
-
-  const intro = document.getElementById("introScreen");
-
-  // total duration before fade out
-  setTimeout(() => {
-
-    intro.style.opacity = "0";
-
-    setTimeout(() => {
-      intro.style.visibility = "hidden";
-      intro.style.display = "none";
-    }, 600);
-
-  }, 2200); // timing controls how long intro shows
-
-});
-
+// INTRO
+window.onload=()=>{
+setTimeout(()=>{
+const intro=document.getElementById("introScreen");
+intro.style.opacity="0";
+setTimeout(()=>intro.style.display="none",600);
+},2200);
+};
 
 </script>
 
