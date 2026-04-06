@@ -443,6 +443,38 @@ Submit Quote
 
 <div id="debugBox" class="text-xs text-yellow-300 mt-4"></div>
 
+<!-- AI PARSE MODAL -->
+<div id="aiModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
+  <div class="glass rounded-2xl p-6 w-full max-w-2xl">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-semibold">AI Shipment Parser</h3>
+      <button type="button" id="closeAiModal" class="text-gray-300 hover:text-white">✕</button>
+    </div>
+
+    <p class="text-sm text-gray-400 mb-3">
+      Paste shipment details in plain text. Example: 3 pallets, 120x100x150 cm, 200 kg each, Miami to Quito, electronics.
+    </p>
+
+    <textarea
+      id="aiInput"
+      class="input w-full rounded-xl p-3 min-h-[180px]"
+      placeholder="Paste shipment details here..."
+    ></textarea>
+
+    <div class="flex gap-3 mt-4">
+      <button type="button" id="runAiParse" class="bg-blue-600 px-4 py-2 rounded-lg">
+        Parse & Autofill
+      </button>
+      <button type="button" id="cancelAiModal" class="bg-white/10 px-4 py-2 rounded-lg">
+        Cancel
+      </button>
+    </div>
+
+    <div id="aiStatus" class="text-sm text-gray-300 mt-3"></div>
+  </div>
+</div>
+
+  
 </form>
 
 <script>
@@ -613,20 +645,28 @@ form.addEventListener("input",()=>{
 });
 
 // AI
-document.getElementById("aiFill").onclick=()=>{
-  const mode = document.getElementById("mode").value;
+const aiModal = document.getElementById("aiModal");
+const aiFillBtn = document.getElementById("aiFill");
+const closeAiModal = document.getElementById("closeAiModal");
+const cancelAiModal = document.getElementById("cancelAiModal");
+const runAiParse = document.getElementById("runAiParse");
+const aiInput = document.getElementById("aiInput");
+const aiStatus = document.getElementById("aiStatus");
 
-  if (mode === "ground") {
-    document.querySelector('[name="originCity"]').value="Miami";
-    document.querySelector('[name="destinationCity"]').value="Orlando";
-  } else {
-    document.querySelector('[name="originSearch"]').value="MIA - Miami, United States";
-    document.querySelector('[name="destinationSearch"]').value="UIO - Quito, Ecuador";
-  }
-
-  form.dispatchEvent(new Event("input"));
+aiFillBtn.onclick = () => {
+  aiModal.classList.remove("hidden");
+  aiModal.classList.add("flex");
+  aiInput.focus();
 };
 
+function closeAiParserModal() {
+  aiModal.classList.add("hidden");
+  aiModal.classList.remove("flex");
+  aiStatus.innerText = "";
+}
+
+closeAiModal.onclick = closeAiParserModal;
+cancelAiModal.onclick = closeAiParserModal;
 // INLAND
 document.getElementById("includeInland").onchange=e=>{
   document.getElementById("inlandFields").classList.toggle("hidden", !e.target.checked);
@@ -956,6 +996,19 @@ document.addEventListener("input", (e) => {
     calculateTotals();
   }
 });
+
+function clearCargoItems() {
+  document.getElementById("cargoItems").innerHTML = "";
+  calculateTotals();
+}
+
+function addCargoItemFromData(itemData = {}) {
+  const div = document.createElement("div");
+  const index = document.querySelectorAll(".cargo-item").length + 1;
+
+  div.innerHTML = `
+  <div class="glass p-4 rounded-xl mb-3 relative cargo
+
   
 </script>
 
