@@ -657,7 +657,8 @@ function updateShipmentUI() {
   form.dispatchEvent(new Event("input"));
 }
 
-
+modeEl.addEventListener("change", updateShipmentUI);
+updateShipmentUI();
 
 //////////////////////////////////////////////////
 // ✅ AUTOCOMPLETE FIX — REPLACE YOUR OLD BLOCK WITH THIS
