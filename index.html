@@ -680,11 +680,11 @@ form.onsubmit = async (e) => {
 
   try {
 
-    // 🔹 1. Generate quote number
+    // 🔹 1. Generate Quote Number
     const quoteNumber = generateQuoteNumber();
     document.getElementById("quoteNumber").value = quoteNumber;
 
-    // 🔹 2. Collect base form data
+    // 🔹 2. Base form data
     const data = new FormData(form);
     const payload = {};
 
@@ -692,41 +692,40 @@ form.onsubmit = async (e) => {
       payload[key] = value;
     });
 
-    // 🔹 3. Add booleans manually
+    // 🔹 3. Booleans
     payload.isFTZ = document.getElementById("isFTZ").checked;
     payload.isBonded = document.getElementById("isBonded").checked;
     payload.includeInland = document.getElementById("includeInland").checked;
 
-// 🔹 PICKUP
-const pickupSection = document.querySelector("#inlandFields > div:first-child");
+    // 🔹 4. PICKUP
+    const pickupSection = document.querySelector("#inlandFields > div:first-child");
 
-payload.pickup = {
-  company: pickupSection.querySelectorAll("input")[0]?.value || "",
-  contact: pickupSection.querySelectorAll("input")[1]?.value || "",
-  phone: pickupSection.querySelectorAll("input")[2]?.value || "",
-  email: pickupSection.querySelectorAll("input")[3]?.value || "",
-  address: pickupSection.querySelectorAll("input")[4]?.value || "",
-  city: pickupSection.querySelectorAll("input")[5]?.value || "",
-  country: pickupSection.querySelectorAll("input")[6]?.value || "",
-  hours: pickupSection.querySelectorAll("input")[7]?.value || ""
-};
+    payload.pickup = {
+      company: pickupSection.querySelectorAll("input")[0]?.value || "",
+      contact: pickupSection.querySelectorAll("input")[1]?.value || "",
+      phone: pickupSection.querySelectorAll("input")[2]?.value || "",
+      email: pickupSection.querySelectorAll("input")[3]?.value || "",
+      address: pickupSection.querySelectorAll("input")[4]?.value || "",
+      city: pickupSection.querySelectorAll("input")[5]?.value || "",
+      country: pickupSection.querySelectorAll("input")[6]?.value || "",
+      hours: pickupSection.querySelectorAll("input")[7]?.value || ""
+    };
 
-// 🔹 DELIVERY
-const deliverySection = document.querySelector("#inlandFields > div:last-child");
+    // 🔹 5. DELIVERY
+    const deliverySection = document.querySelector("#inlandFields > div:last-child");
 
-payload.delivery = {
-  company: deliverySection.querySelectorAll("input")[0]?.value || "",
-  contact: deliverySection.querySelectorAll("input")[1]?.value || "",
-  phone: deliverySection.querySelectorAll("input")[2]?.value || "",
-  email: deliverySection.querySelectorAll("input")[3]?.value || "",
-  address: deliverySection.querySelectorAll("input")[4]?.value || "",
-  city: deliverySection.querySelectorAll("input")[5]?.value || "",
-  country: deliverySection.querySelectorAll("input")[6]?.value || "",
-  hours: deliverySection.querySelectorAll("input")[7]?.value || ""
-};
-    
+    payload.delivery = {
+      company: deliverySection.querySelectorAll("input")[0]?.value || "",
+      contact: deliverySection.querySelectorAll("input")[1]?.value || "",
+      phone: deliverySection.querySelectorAll("input")[2]?.value || "",
+      email: deliverySection.querySelectorAll("input")[3]?.value || "",
+      address: deliverySection.querySelectorAll("input")[4]?.value || "",
+      city: deliverySection.querySelectorAll("input")[5]?.value || "",
+      country: deliverySection.querySelectorAll("input")[6]?.value || "",
+      hours: deliverySection.querySelectorAll("input")[7]?.value || ""
+    };
 
-    // 🔹 4. Collect cargo items
+    // 🔹 6. CARGO
     payload.cargo = [];
 
     document.querySelectorAll(".cargo-item").forEach(item => {
@@ -741,119 +740,107 @@ payload.delivery = {
       let H = parseFloat(item.querySelector(".height")?.value) || 0;
       const dimUnit = item.querySelector(".dimUnit")?.value;
 
-      // 🔹 normalize to metric
-      if (weightUnit === "lb") weight *= 0.453592;
-      if (dimUnit === "in") {
-        L *= 2.54;
-        W *= 2.54;
-        H *= 2.54;
-      }
+      // 🔹 FULL CONVERSIONS
+      const weightKg = weightUnit === "lb" ? weight * 0.453592 : weight;
+      const weightLb = weightUnit === "kg" ? weight * 2.20462 : weight;
 
-      const cbm = (L * W * H) / 1000000;
+      const lengthCm = dimUnit === "in" ? L * 2.54 : L;
+      const widthCm  = dimUnit === "in" ? W * 2.54 : W;
+      const heightCm = dimUnit === "in" ? H * 2.54 : H;
 
+      const lengthIn = dimUnit === "cm" ? L / 2.54 : L;
+      const widthIn  = dimUnit === "cm" ? W / 2.54 : W;
+      const heightIn = dimUnit === "cm" ? H / 2.54 : H;
 
-// 🔹 TOTALS
-let totalWeightKg = 0;
-let totalVolumeCBM = 0;
+      const cbm = (lengthCm * widthCm * heightCm) / 1000000;
+      const cft = cbm * 35.3147;
 
-payload.cargo.forEach(item => {
-  totalWeightKg += (item.normalized.weight.value * item.qty);
-  totalVolumeCBM += (item.volume.cbm.value * item.qty);
-});
-
-// ✈ chargeable weight (air logic)
-const volumetricWeightKg = totalVolumeCBM * 167;
-const chargeableWeightKg = Math.max(totalWeightKg, volumetricWeightKg);
-
-// 🔹 CONVERSIONS
-const totalWeightLb = kgToLb(totalWeightKg);
-const totalVolumeFt3 = cbmToFt3(totalVolumeCBM);
-const chargeableWeightLb = kgToLb(chargeableWeightKg);
-
-// 🔹 ATTACH TO PAYLOAD
-payload.totals = {
-
-  weight: {
-    kg: { value: Number(totalWeightKg.toFixed(2)), unit: "kg" },
-    lb: { value: Number(totalWeightLb.toFixed(2)), unit: "lb" }
-  },
-
-  volume: {
-    cbm: { value: Number(totalVolumeCBM.toFixed(3)), unit: "m3" },
-    cft: { value: Number(totalVolumeFt3.toFixed(2)), unit: "ft3" }
-  },
-
-  chargeableWeight: {
-    kg: { value: Number(chargeableWeightKg.toFixed(2)), unit: "kg" },
-    lb: { value: Number(chargeableWeightLb.toFixed(2)), unit: "lb" }
-  }
-
-};
-
-      
       payload.cargo.push({
 
-  // 🔹 IDENTIFICATION
-  commodity: item.querySelector(".commodity")?.value || "",
-  packagingType: item.querySelector(".packagingType")?.value || "",
-  cargoType: item.querySelector(".cargoType")?.value || "",
-  qty,
+        commodity: item.querySelector(".commodity")?.value || "",
+        packagingType: item.querySelector(".packagingType")?.value || "",
+        cargoType: item.querySelector(".cargoType")?.value || "",
+        qty,
 
-  // 🔹 USER INPUT (RAW)
-  weight: {
-    value: parseFloat(item.querySelector(".weight")?.value) || 0,
-    unit: weightUnit
-  },
+        weight: { value: weight, unit: weightUnit },
 
-  dimensions: {
-    length: { value: L, unit: dimUnit },
-    width:  { value: W, unit: dimUnit },
-    height: { value: H, unit: dimUnit }
-  },
+        dimensions: {
+          length: { value: L, unit: dimUnit },
+          width:  { value: W, unit: dimUnit },
+          height: { value: H, unit: dimUnit }
+        },
 
-  // 🔹 NORMALIZED (SYSTEM STANDARD)
-  normalized: {
-    weight: { value: weightKg, unit: "kg" },
-    dimensions: {
-      length: { value: lengthCm, unit: "cm" },
-      width:  { value: widthCm, unit: "cm" },
-      height: { value: heightCm, unit: "cm" }
-    }
-  },
+        normalized: {
+          weight: { value: weightKg, unit: "kg" },
+          dimensions: {
+            length: { value: lengthCm, unit: "cm" },
+            width:  { value: widthCm, unit: "cm" },
+            height: { value: heightCm, unit: "cm" }
+          }
+        },
 
-  // 🔹 DERIVED (BUSINESS LOGIC)
-  volume: {
-    cbm: { value: cbm, unit: "m3" },
-    cft: { value: cft, unit: "ft3" }
-  },
+        volume: {
+          cbm: { value: cbm, unit: "m3" },
+          cft: { value: cft, unit: "ft3" }
+        },
 
-  // 🔹 CONVERSIONS (UX / DISPLAY)
-  converted: {
-    weight: {
-      kg: { value: weightKg, unit: "kg" },
-      lb: { value: weightLb, unit: "lb" }
-    },
-    dimensions: {
-      cm: {
-        length: { value: lengthCm, unit: "cm" },
-        width:  { value: widthCm, unit: "cm" },
-        height: { value: heightCm, unit: "cm" }
-      },
-      in: {
-        length: { value: lengthIn, unit: "in" },
-        width:  { value: widthIn, unit: "in" },
-        height: { value: heightIn, unit: "in" }
-      }
-    }
-  }
+        converted: {
+          weight: {
+            kg: { value: weightKg, unit: "kg" },
+            lb: { value: weightLb, unit: "lb" }
+          },
+          dimensions: {
+            cm: {
+              length: { value: lengthCm, unit: "cm" },
+              width:  { value: widthCm, unit: "cm" },
+              height: { value: heightCm, unit: "cm" }
+            },
+            in: {
+              length: { value: lengthIn, unit: "in" },
+              width:  { value: widthIn, unit: "in" },
+              height: { value: heightIn, unit: "in" }
+            }
+          }
+        }
 
-});
+      });
 
     });
 
+    // 🔹 7. TOTALS (AFTER cargo built)
+    let totalWeightKg = 0;
+    let totalVolumeCBM = 0;
+
+    payload.cargo.forEach(item => {
+      totalWeightKg += (item.normalized.weight.value * item.qty);
+      totalVolumeCBM += (item.volume.cbm.value * item.qty);
+    });
+
+    const volumetricWeightKg = totalVolumeCBM * 167;
+    const chargeableWeightKg = Math.max(totalWeightKg, volumetricWeightKg);
+
+    const totalWeightLb = totalWeightKg * 2.20462;
+    const totalVolumeFt3 = totalVolumeCBM * 35.3147;
+    const chargeableWeightLb = chargeableWeightKg * 2.20462;
+
+    payload.totals = {
+      weight: {
+        kg: { value: Number(totalWeightKg.toFixed(2)), unit: "kg" },
+        lb: { value: Number(totalWeightLb.toFixed(2)), unit: "lb" }
+      },
+      volume: {
+        cbm: { value: Number(totalVolumeCBM.toFixed(3)), unit: "m3" },
+        cft: { value: Number(totalVolumeFt3.toFixed(2)), unit: "ft3" }
+      },
+      chargeableWeight: {
+        kg: { value: Number(chargeableWeightKg.toFixed(2)), unit: "kg" },
+        lb: { value: Number(chargeableWeightLb.toFixed(2)), unit: "lb" }
+      }
+    };
+
     console.log("SENDING PAYLOAD:", payload);
 
-    // 🔹 5. Send to n8n
+    // 🔹 8. SEND TO N8N
     const res = await fetch("https://n8n-n10ai.onrender.com/webhook/new-design-pricing", {
       method: "POST",
       headers: {
@@ -862,7 +849,12 @@ payload.totals = {
       body: JSON.stringify(payload)
     });
 
-    const result = await res.json();
+    let result = {};
+    try {
+      result = await res.json();
+    } catch {
+      result = { success: true };
+    }
 
     console.log("N8N RESPONSE:", result);
 
@@ -872,9 +864,7 @@ payload.totals = {
     console.error(err);
     alert("Error submitting quote");
   }
-
 };
-
 // INTRO FIX
 document.addEventListener("DOMContentLoaded", () => {
   const intro = document.getElementById("introScreen");
