@@ -697,33 +697,33 @@ form.onsubmit = async (e) => {
     payload.isBonded = document.getElementById("isBonded").checked;
     payload.includeInland = document.getElementById("includeInland").checked;
 
-    // 🔹 4. PICKUP
-    const pickupSection = document.querySelector("#inlandFields > div:first-child");
+   // 🔹 PICKUP SAFE
+const pickupSection = document.querySelector("#inlandFields > div:first-child");
 
-    payload.pickup = {
-      company: pickupSection.querySelectorAll("input")[0]?.value || "",
-      contact: pickupSection.querySelectorAll("input")[1]?.value || "",
-      phone: pickupSection.querySelectorAll("input")[2]?.value || "",
-      email: pickupSection.querySelectorAll("input")[3]?.value || "",
-      address: pickupSection.querySelectorAll("input")[4]?.value || "",
-      city: pickupSection.querySelectorAll("input")[5]?.value || "",
-      country: pickupSection.querySelectorAll("input")[6]?.value || "",
-      hours: pickupSection.querySelectorAll("input")[7]?.value || ""
-    };
+payload.pickup = {
+  company: pickupSection?.querySelectorAll("input")[0]?.value || "",
+  contact: pickupSection?.querySelectorAll("input")[1]?.value || "",
+  phone: pickupSection?.querySelectorAll("input")[2]?.value || "",
+  email: pickupSection?.querySelectorAll("input")[3]?.value || "",
+  address: pickupSection?.querySelectorAll("input")[4]?.value || "",
+  city: pickupSection?.querySelectorAll("input")[5]?.value || "",
+  country: pickupSection?.querySelectorAll("input")[6]?.value || "",
+  hours: pickupSection?.querySelectorAll("input")[7]?.value || ""
+};
 
-    // 🔹 5. DELIVERY
-    const deliverySection = document.querySelector("#inlandFields > div:last-child");
+// 🔹 DELIVERY SAFE
+const deliverySection = document.querySelector("#inlandFields > div:last-child");
 
-    payload.delivery = {
-      company: deliverySection.querySelectorAll("input")[0]?.value || "",
-      contact: deliverySection.querySelectorAll("input")[1]?.value || "",
-      phone: deliverySection.querySelectorAll("input")[2]?.value || "",
-      email: deliverySection.querySelectorAll("input")[3]?.value || "",
-      address: deliverySection.querySelectorAll("input")[4]?.value || "",
-      city: deliverySection.querySelectorAll("input")[5]?.value || "",
-      country: deliverySection.querySelectorAll("input")[6]?.value || "",
-      hours: deliverySection.querySelectorAll("input")[7]?.value || ""
-    };
+payload.delivery = {
+  company: deliverySection?.querySelectorAll("input")[0]?.value || "",
+  contact: deliverySection?.querySelectorAll("input")[1]?.value || "",
+  phone: deliverySection?.querySelectorAll("input")[2]?.value || "",
+  email: deliverySection?.querySelectorAll("input")[3]?.value || "",
+  address: deliverySection?.querySelectorAll("input")[4]?.value || "",
+  city: deliverySection?.querySelectorAll("input")[5]?.value || "",
+  country: deliverySection?.querySelectorAll("input")[6]?.value || "",
+  hours: deliverySection?.querySelectorAll("input")[7]?.value || ""
+};
 
     // 🔹 6. CARGO
     payload.cargo = [];
@@ -755,6 +755,7 @@ form.onsubmit = async (e) => {
       const cbm = (lengthCm * widthCm * heightCm) / 1000000;
       const cft = cbm * 35.3147;
 
+      if (!qty && !weight && !L && !W && !H) return;
       payload.cargo.push({
 
         commodity: item.querySelector(".commodity")?.value || "",
@@ -860,9 +861,10 @@ form.onsubmit = async (e) => {
 
     alert("Quote submitted successfully: " + quoteNumber);
 
-  } catch (err) {
-    console.error(err);
-    alert("Error submitting quote");
+  }catch (err) {
+  console.error("SUBMIT ERROR:", err);
+  alert("Error submitting quote: " + err.message);
+}
   }
 };
 // INTRO FIX
@@ -1303,7 +1305,7 @@ function addCargoItemFromData(itemData = {}) {
 
   try {
 
-    const res = await fetch("https://n8n-n10ai.onrender.com/webhook/ai parser 2", {
+    const res = await fetch("https://n8n-n10ai.onrender.com/webhook/ai-parser-2", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -1346,6 +1348,17 @@ function generateQuoteNumber() {
   const randomPart = Math.floor(1000 + Math.random() * 9000);
 
   return `MIP-${datePart}-${timePart}-${randomPart}`;
+}
+
+
+if (!payload.email) {
+  alert("Email is required");
+  return;
+}
+
+if (payload.cargo.length === 0) {
+  alert("Please add at least one cargo item");
+  return;
 }
   
 </script>
