@@ -203,6 +203,8 @@ No back-and-forth. No delays.
 <!-- STEP 0: CONTACT -->
 <div class="step active">
 
+  <div class="grid grid-cols-1 gap-4">
+
     <input
       name="referenceNumber"
       class="input p-3 rounded-lg"
@@ -216,43 +218,46 @@ No back-and-forth. No delays.
       class="input p-3 rounded-lg"
       placeholder="Email Address"
     >
+
   </div>
 
   <button type="button" class="next mt-6 bg-blue-600 px-4 py-2 rounded">
     Continue
   </button>
-</div>
 
+</div>
 <!-- STEP 1: SHIPMENT -->
 <div class="step">
-<div class="text-xs text-gray-400 mb-2">
-Route
-    <div class="grid grid-cols-1 gap-4"><div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-  <div>
-    <label class="text-xs text-gray-400 mb-1 block">From</label>
-    <input
-      id="originSearch"
-      name="originSearch"
-      class="input p-3 rounded-lg w-full"
-      autocomplete="off"
-      placeholder="Origin Airport / Port / City"
-    >
+  <div class="text-xs text-gray-400 mb-2">
+    Route
   </div>
 
-  <div>
-    <label class="text-xs text-gray-400 mb-1 block">To</label>
-    <input
-      id="destinationSearch"
-      name="destinationSearch"
-      class="input p-3 rounded-lg w-full"
-      autocomplete="off"
-      placeholder="Destination Airport / Port / City"
-    >
-  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 
-</div>
-</div>
+    <div>
+      <label class="text-xs text-gray-400 mb-1 block">From</label>
+      <input
+        id="originSearch"
+        name="originSearch"
+        class="input p-3 rounded-lg w-full"
+        autocomplete="off"
+        placeholder="Origin Airport / Port / City"
+      >
+    </div>
+
+    <div>
+      <label class="text-xs text-gray-400 mb-1 block">To</label>
+      <input
+        id="destinationSearch"
+        name="destinationSearch"
+        class="input p-3 rounded-lg w-full"
+        autocomplete="off"
+        placeholder="Destination Airport / Port / City"
+      >
+    </div>
+
+  </div>
 <!-- MODE -->
 <select id="mode" name="mode" class="input p-3 rounded-lg w-full mb-4">
   <option value="">Transport Mode</option>
@@ -264,29 +269,6 @@ Route
 <!-- AIR / OCEAN ROUTE -->
 <div id="airOceanFields">
 
-<div class="grid grid-cols-1 gap-4">
-
-  <div class="relative">
-    <input
-      id="originSearch"
-      name="originSearch"
-      class="input p-3 rounded-lg w-full"
-      autocomplete="off"
-      placeholder="Origin Airport / Port / City"
-    >
-  </div>
-
-  <div class="relative">
-    <input
-      id="destinationSearch"
-      name="destinationSearch"
-      class="input p-3 rounded-lg w-full"
-      autocomplete="off"
-      placeholder="Destination Airport / Port / City"
-    >
-  </div>
-
-</div>
 
   <!-- hidden structured fields for later autocomplete/JSON hookup -->
   <input type="hidden" id="originCode" name="originCode">
