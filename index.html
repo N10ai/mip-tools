@@ -692,6 +692,17 @@ form.onsubmit = async (e) => {
       payload[key] = value;
     });
 
+if (!payload.email) {
+  alert("Email is required");
+  return;
+}
+
+if (payload.cargo.length === 0) {
+  alert("Please add at least one cargo item");
+  return;
+}
+
+    
     // 🔹 3. Booleans
     payload.isFTZ = document.getElementById("isFTZ").checked;
     payload.isBonded = document.getElementById("isBonded").checked;
@@ -1351,15 +1362,7 @@ function generateQuoteNumber() {
 }
 
 
-if (!payload.email) {
-  alert("Email is required");
-  return;
-}
 
-if (payload.cargo.length === 0) {
-  alert("Please add at least one cargo item");
-  return;
-}
   
 </script>
 
