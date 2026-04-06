@@ -529,30 +529,33 @@ div.innerHTML = `
   <div class="text-xs text-gray-400 mt-3 mb-1">
   Dimensions & Weight
 </div>
-  <div class="grid grid-cols-2 md:grid-cols-6 gap-2">
+<!-- WEIGHT -->
+<div class="grid grid-cols-4 gap-2 mb-2">
 
-    <input class="input p-2 rounded qty" placeholder="Qty">
+  <input class="input p-2 rounded qty col-span-1" placeholder="Qty">
 
-    <input class="input p-2 rounded weight" placeholder="Weight">
+  <input class="input p-2 rounded weight col-span-2" placeholder="Weight">
 
-    <select class="input p-2 rounded weightUnit">
-      <option value="kg">kg</option>
-      <option value="lb">lb</option>
-    </select>
+  <select class="input p-2 rounded weightUnit col-span-1">
+    <option value="kg">kg</option>
+    <option value="lb">lb</option>
+  </select>
 
+</div>
 
-    <input class="input p-2 rounded length" placeholder="L">
+<!-- DIMENSIONS -->
+<div class="grid grid-cols-4 gap-2">
 
-    <input class="input p-2 rounded width" placeholder="W">
+  <input class="input p-2 rounded length col-span-1" placeholder="L">
 
-    <input class="input p-2 rounded height" placeholder="H">
+  <input class="input p-2 rounded width col-span-1" placeholder="W">
 
-    <select class="input p-2 rounded dimUnit col-span-2 md:col-span-1">
-      <option value="cm">cm</option>
-      <option value="in">in</option>
-    </select>
+  <input class="input p-2 rounded height col-span-1" placeholder="H">
 
-  </div>
+  <select class="input p-2 rounded dimUnit col-span-1">
+    <option value="cm">cm</option>
+    <option value="in">in</option>
+  </select>
 
 </div>
 `;
