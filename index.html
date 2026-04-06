@@ -8,17 +8,6 @@
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
-
-.glass {
-  position: relative;
-  z-index: 1;
-}
-
-input {
-  position: relative;
-  z-index: 10;
-}
-
 html, body {
   min-height: 100%;
   margin: 0;
@@ -69,7 +58,6 @@ body {
   height:8px;
   background:#1e293b;
   border-radius:999px;
-  overflow:hidden;
 }
 
 .progress-fill {
@@ -82,29 +70,7 @@ body {
 /* INTRO */
 
 #introScreen {
-  transition: opacity 0.6s ease, visibility 0.6s;
-}
-
-.intro-logo {
-  transform: scale(0.7);
-  opacity: 0;
-  animation: logoIn 2.9s ease forwards;
-}
-
-.intro-text {
-  transform: translateY(20px);
-  animation: textIn 1s ease forwards;
-  animation-delay: 0.8s;
-}
-
-@keyframes logoIn {
-  0% { opacity:0; transform:scale(0.7);}
-  60% { opacity:1; transform:scale(2);}
-  100% { transform:scale(1);}
-}
-
-@keyframes textIn {
-  to { opacity:1; transform:translateY(0);}
+  transition: opacity 0.6s ease;
 }
 </style>
 </head>
@@ -116,10 +82,10 @@ body {
 
 <img 
 src="https://raw.githubusercontent.com/N10ai/mip-tools/main/Untitled%20design%20-%201.png"
-class="w-24 h-24 mb-6 intro-logo object-contain"
+class="w-24 h-24 mb-6 object-contain"
 />
 
-<div class="text-lg tracking-wide text-white opacity-0 intro-text">
+<div class="text-lg text-white">
 Smart Logistics. Faster Decisions.
 </div>
 
@@ -132,7 +98,7 @@ Smart Logistics. Faster Decisions.
 
 <div class="flex items-center gap-3">
 <img src="https://raw.githubusercontent.com/N10ai/mip-tools/main/Untitled%20design%20-%201.png"
-class="h-14 object-contain drop-shadow-xl">
+class="h-14 object-contain">
 
 <div>
 <div class="text-sm font-semibold">MIP Cargo Express</div>
@@ -142,23 +108,10 @@ class="h-14 object-contain drop-shadow-xl">
 
 <button type="button" id="aiFill"
 class="px-5 py-2.5 rounded-lg text-sm font-semibold
-bg-gradient-to-r from-blue-500 to-indigo-500
-hover:from-blue-400 hover:to-indigo-400
-text-white shadow-lg shadow-blue-500/30 transition">
-⚡ Autofill with AI
+bg-gradient-to-r from-blue-500 to-indigo-500 text-white">
+⚡ Autofill
 </button>
 
-</div>
-
-<!-- HERO -->
-<div class="mb-6">
-<h2 class="text-2xl font-semibold mb-2">
-Get your freight quote in seconds
-</h2>
-<p class="text-sm text-gray-400 max-w-xl">
-Enter shipment details or use AI Autofill to instantly structure your quote.
-No back-and-forth. No delays.
-</p>
 </div>
 
 <!-- TABS -->
@@ -179,177 +132,50 @@ No back-and-forth. No delays.
 <!-- LEFT -->
 <div class="lg:col-span-2 glass p-6 rounded-2xl">
 
-<!-- STEP 0: CONTACT -->
+<!-- STEP 0 -->
 <div class="step active">
-  <div class="grid grid-cols-1 gap-4">
-    <input
-      name="referenceNumber"
-      class="input p-3 rounded-lg"
-      placeholder="Reference Number (optional)"
-    >
-
-    <input
-      name="email"
-      type="email"
-      required
-      class="input p-3 rounded-lg"
-      placeholder="Email Address"
-    >
-  </div>
-
-  <button type="button" class="next mt-6 bg-blue-600 px-4 py-2 rounded">
-    Continue
-  </button>
+<input name="referenceNumber" class="input p-3 rounded-lg mb-4" placeholder="Reference">
+<input name="email" type="email" required class="input p-3 rounded-lg" placeholder="Email">
+<button type="button" class="next mt-6 bg-blue-600 px-4 py-2 rounded">Continue</button>
 </div>
 
-<!-- STEP 1: SHIPMENT -->
+<!-- STEP 1 -->
 <div class="step">
 
-<!-- MODE -->
 <select id="mode" name="mode" class="input p-3 rounded-lg w-full mb-4">
-  <option value="">Transport Mode</option>
-  <option value="air">✈ Air</option>
-  <option value="ocean">🚢 Ocean</option>
-  <option value="ground">🚚 Ground</option>
+<option value="">Mode</option>
+<option value="air">Air</option>
+<option value="ocean">Ocean</option>
+<option value="ground">Ground</option>
 </select>
 
-<!-- AIR / OCEAN ROUTE -->
 <div id="airOceanFields">
+<input id="originSearch" class="input p-3 rounded-lg mb-3" placeholder="Origin">
+<input id="destinationSearch" class="input p-3 rounded-lg" placeholder="Destination">
 
-  <div class="grid grid-cols-1 gap-4">
-
-    <input
-      id="originSearch"
-      name="originSearch"
-      class="input p-3 rounded-lg"
-      placeholder="Origin Airport / Port / City"
-    >
-
-    <input
-      id="destinationSearch"
-      name="destinationSearch"
-      class="input p-3 rounded-lg"
-      placeholder="Destination Airport / Port / City"
-    >
-
-  </div>
-
-  <!-- hidden structured fields for later autocomplete/JSON hookup -->
-  <input type="hidden" id="originCode" name="originCode">
-  <input type="hidden" id="originName" name="originName">
-  <input type="hidden" id="originCountry" name="originCountry">
-
-  <input type="hidden" id="destinationCode" name="destinationCode">
-  <input type="hidden" id="destinationName" name="destinationName">
-  <input type="hidden" id="destinationCountry" name="destinationCountry">
-
+<input type="hidden" id="originCode">
+<input type="hidden" id="destinationCode">
 </div>
 
-<!-- GROUND ROUTE -->
-<div id="groundFields" class="hidden">
-
-  <div class="grid grid-cols-2 gap-4">
-
-    <input name="originCity" class="input p-3 rounded-lg" placeholder="Origin City">
-    <input name="destinationCity" class="input p-3 rounded-lg" placeholder="Destination City">
-
-    <input name="originState" class="input p-3 rounded-lg" placeholder="Origin State">
-    <input name="destinationState" class="input p-3 rounded-lg" placeholder="Destination State">
-
-    <input name="originCountryGround" class="input p-3 rounded-lg" placeholder="Origin Country">
-    <input name="destinationCountryGround" class="input p-3 rounded-lg" placeholder="Destination Country">
-
-  </div>
-
+<div id="serviceWrap" class="hidden mt-4">
+<select id="serviceType" class="input p-3 rounded-lg w-full"></select>
 </div>
 
-<!-- SERVICE -->
-<div id="serviceWrap" class="mt-5 hidden">
-
-  <select id="serviceType" name="serviceType" class="input p-3 rounded-lg w-full">
-    <option value="">Service Type</option>
-  </select>
-
-</div>
-
-<!-- CONTAINER (ONLY FCL) -->
-<div id="containerWrap" class="mt-4 hidden">
-
-  <select name="containerSize" class="input p-3 rounded-lg w-full">
-    <option value="">Container Size</option>
-    <option>20GP</option>
-    <option>40GP</option>
-    <option>40HQ</option>
-    <option>45HQ</option>
-  </select>
-
-</div>
-
-<!-- BONDED / FTZ -->
-<div class="mt-5 flex gap-4 text-sm">
-  <label><input type="checkbox" id="isBonded"> Bonded</label>
-  <label><input type="checkbox" id="isFTZ"> FTZ</label>
-</div>
-
-<div class="flex justify-between mt-6">
-  <button type="button" class="prev bg-white/10 px-4 py-2 rounded">Back</button>
-  <button type="button" class="next bg-blue-600 px-4 py-2 rounded">Next</button>
-</div>
+<button type="button" class="next mt-6 bg-blue-600 px-4 py-2 rounded">Next</button>
 
 </div>
 
 <!-- STEP 2 -->
 <div class="step">
-
 <div id="cargoItems"></div>
-
-<button type="button" id="addCargo" class="mt-4 bg-blue-600 px-4 py-2 rounded">
-+ Add Cargo
-</button>
-
-<div id="totals" class="mt-4 text-sm"></div>
-
-<div class="flex justify-between mt-6">
-<button type="button" class="prev bg-white/10 px-4 py-2 rounded">Back</button>
-<button type="button" class="next bg-blue-600 px-4 py-2 rounded">Next</button>
-</div>
-
-</div>
-
-<!-- STEP 3 -->
-<div class="step">
-
-<label><input type="checkbox" id="includeInland"> Include Inland</label>
-
-<div id="inlandFields" class="hidden mt-4">
-<input id="pickupCompany" class="input p-3 rounded mb-2" placeholder="Pickup Company">
-<input id="deliveryCompany" class="input p-3 rounded" placeholder="Delivery Company">
-</div>
-
-<div class="flex justify-between mt-6">
-<button type="button" class="prev bg-white/10 px-4 py-2 rounded">Back</button>
-<button type="button" class="next bg-blue-600 px-4 py-2 rounded">Next</button>
-</div>
-
-</div>
-
-<!-- STEP 4 -->
-<div class="step">
-
-<div id="review"></div>
-
-<button type="submit" class="mt-6 w-full bg-blue-600 py-3 rounded">
-Submit Quote
-</button>
-
+<button id="addCargo" type="button" class="bg-blue-600 px-4 py-2 mt-4 rounded">+ Cargo</button>
 </div>
 
 </div>
 
 <!-- RIGHT -->
 <div class="glass p-6 rounded-2xl">
-<h2 class="mb-4">Live Summary</h2>
-<div id="summary" class="text-sm space-y-2"></div>
+<div id="summary"></div>
 </div>
 
 </div>
@@ -357,273 +183,82 @@ Submit Quote
 
 <script>
 
-<!-- ONLY SCRIPT PART CHANGED — EVERYTHING ELSE PRESERVED -->
+// INTRO FIX
+document.addEventListener("DOMContentLoaded",()=>{
+  setTimeout(()=>{
+    document.getElementById("introScreen").style.display="none";
+  },1500);
+});
 
-
-// STEP SYSTEM
-let step = 0;
-const steps = document.querySelectorAll(".step");
+// STEP
+let step=0;
+const steps=document.querySelectorAll(".step");
 
 function showStep(i){
-  if (i < 0 || i > steps.length - 1) return;
-
-  step = i;
-
-  steps.forEach((s,idx)=>s.classList.toggle("active", idx===i));
-
-  document.querySelectorAll(".tab").forEach((t,idx)=>{
-    t.classList.toggle("tab-active", idx===i);
-  });
-
-  document.getElementById("progress").style.width = ((i+1)/5*100)+"%";
+  step=i;
+  steps.forEach((s,idx)=>s.classList.toggle("active",idx===i));
+  document.getElementById("progress").style.width=((i+1)/5*100)+"%";
 }
 
-document.querySelectorAll(".next").forEach(btn=>{
-  btn.onclick = ()=>showStep(step+1);
-});
-
-document.querySelectorAll(".prev").forEach(btn=>{
-  btn.onclick = ()=>showStep(step-1);
-});
-
-document.querySelectorAll(".tab").forEach(tab=>{
-  tab.onclick = ()=>showStep(Number(tab.dataset.step));
-});
+document.querySelectorAll(".next").forEach(b=>b.onclick=()=>showStep(step+1));
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>showStep(+t.dataset.step));
 
 // CARGO
-document.getElementById("addCargo").onclick = ()=>{
-  const div = document.createElement("div");
-  div.className="mb-4";
-
-  div.innerHTML=`
-  <input class="input p-2 mb-1 qty rounded" placeholder="Qty">
-  <input class="input p-2 mb-1 weight rounded" placeholder="Weight">
-  <input class="input p-2 mb-1 length rounded" placeholder="Length">
-  <input class="input p-2 mb-1 width rounded" placeholder="Width">
-  <input class="input p-2 mb-1 height rounded" placeholder="Height">
-  `;
-
-  document.getElementById("cargoItems").appendChild(div);
+document.getElementById("addCargo").onclick=()=>{
+  const d=document.createElement("div");
+  d.innerHTML=`<input class="input p-2 mb-2" placeholder="Qty">`;
+  cargoItems.appendChild(d);
 };
-
-// SUMMARY
-const form=document.getElementById("quoteForm");
-
-form.addEventListener("input",()=>{
-  const data=new FormData(form);
-
-  const mode = data.get("mode") || "-";
-  const origin = mode === "ground"
-    ? (data.get("originCity") || "-")
-    : (data.get("originSearch") || "-");
-
-  const destination = mode === "ground"
-    ? (data.get("destinationCity") || "-")
-    : (data.get("destinationSearch") || "-");
-
-  const reference = data.get("referenceNumber") || "-";
-  const email = data.get("email") || "-";
-
-  document.getElementById("summary").innerHTML=`
-  <p>Reference: ${reference}</p>
-  <p>Email: ${email}</p>
-  <p>Origin: ${origin}</p>
-  <p>Destination: ${destination}</p>
-  <p>Mode: ${mode}</p>
-  `;
-});
-
-// AI
-document.getElementById("aiFill").onclick=()=>{
-  const mode = document.getElementById("mode").value;
-
-  if (mode === "ground") {
-    document.querySelector('[name="originCity"]').value="Miami";
-    document.querySelector('[name="destinationCity"]').value="Orlando";
-  } else {
-    document.querySelector('[name="originSearch"]').value="MIA - Miami, United States";
-    document.querySelector('[name="destinationSearch"]').value="UIO - Quito, Ecuador";
-  }
-
-  form.dispatchEvent(new Event("input"));
-};
-
-// INLAND
-document.getElementById("includeInland").onchange=e=>{
-  document.getElementById("inlandFields").classList.toggle("hidden", !e.target.checked);
-};
-
-// SUBMIT
-form.onsubmit=(e)=>{
-  e.preventDefault();
-  alert("Ready to connect webhook");
-};
-
-// INTRO
-
-//////////////////////////////////////////////////
-// INTRO FIX (DO NOT USE window.onload)
-//////////////////////////////////////////////////
-
-document.addEventListener("DOMContentLoaded", () => {
-
-  const intro = document.getElementById("introScreen");
-
-  // fallback safety (force hide no matter what)
-  setTimeout(() => {
-
-    intro.style.opacity = "0";
-
-    setTimeout(() => {
-      intro.style.display = "none";
-    }, 600);
-
-  }, 2000);
-
-});
-
 
 // SERVICE
-const modeEl = document.getElementById("mode");
-const serviceEl = document.getElementById("serviceType");
-
-const serviceWrap = document.getElementById("serviceWrap");
-const containerWrap = document.getElementById("containerWrap");
-
-const airOceanFields = document.getElementById("airOceanFields");
-const groundFields = document.getElementById("groundFields");
-
-function updateShipmentUI() {
-
-  const mode = modeEl.value;
-
+mode.onchange=()=>{
   serviceWrap.classList.add("hidden");
-  containerWrap.classList.add("hidden");
-  serviceEl.innerHTML = '<option value="">Service Type</option>';
+  serviceType.innerHTML="";
 
-  if (mode === "ground") {
-    airOceanFields.classList.add("hidden");
-    groundFields.classList.remove("hidden");
-  } else {
-    airOceanFields.classList.remove("hidden");
-    groundFields.classList.add("hidden");
-  }
-
-  if (mode === "ocean") {
+  if(mode.value==="ocean"){
     serviceWrap.classList.remove("hidden");
-    serviceEl.innerHTML += `
-      <option value="lcl">LCL</option>
-      <option value="fcl">FCL</option>
-    `;
+    serviceType.innerHTML=`<option>LCL</option><option>FCL</option>`;
   }
+};
 
-  if (mode === "ground") {
-    serviceWrap.classList.remove("hidden");
-    serviceEl.innerHTML += `
-      <option value="ltl">LTL</option>
-      <option value="ftl">FTL</option>
-    `;
-  }
+// AUTOCOMPLETE
+let locations=[];
 
-  form.dispatchEvent(new Event("input"));
-}
-
-serviceEl.addEventListener("change", () => {
-  containerWrap.classList.toggle("hidden", serviceEl.value !== "fcl");
+fetch("https://raw.githubusercontent.com/N10ai/mip-tools/main/logistics-locations.json")
+.then(r=>r.json())
+.then(d=>{
+  locations=d;
+  attach("originSearch","origin");
+  attach("destinationSearch","destination");
 });
 
-modeEl.addEventListener("change", updateShipmentUI);
-updateShipmentUI();
+function attach(id,type){
+  const input=document.getElementById(id);
+  const box=document.createElement("div");
+  box.className="absolute bg-black text-white w-full mt-1 hidden z-50";
+  input.parentElement.appendChild(box);
 
+  input.oninput=()=>{
+    const q=input.value.toLowerCase();
+    if(q.length<2)return box.classList.add("hidden");
 
-//////////////////////////////////////////////////
-//////////////////////////////////////////////////
-// 🔥 HARD DEBUG AUTOCOMPLETE (WORKS 100%)
-//////////////////////////////////////////////////
+    const res=locations.filter(l=>(l.search||"").toLowerCase().includes(q)).slice(0,5);
 
-let locations = [];
-
-// FORCE LOAD + DEBUG
-async function loadLocations() {
-  try {
-
-    const res = await fetch("https://raw.githubusercontent.com/N10ai/mip-tools/main/logistics-locations.json");
-
-    const text = await res.text(); // 🔥 key fix
-    locations = JSON.parse(text);
-
-    console.log("✅ Locations loaded:", locations.length);
-
-    attachAutocomplete("originSearch", "origin");
-    attachAutocomplete("destinationSearch", "destination");
-
-  } catch (err) {
-    console.error("❌ JSON FAILED:", err);
-  }
-}
-
-loadLocations();
-
-
-function filterLocations(query, mode) {
-
-  query = query.toLowerCase();
-
-  let results = locations.filter(loc => {
-
-    const text = (loc.search || 
-      `${loc.code} ${loc.name} ${loc.city} ${loc.country}`).toLowerCase();
-
-    return text.includes(query);
-  });
-
-  return results.slice(0, 6);
-}
-
-
-function attachAutocomplete(inputId, type) {
-
-  const input = document.getElementById(inputId);
-
-  const dropdown = document.createElement("div");
-  dropdown.className = "absolute z-[9999] bg-red-500 text-white mt-1 w-full text-sm hidden";
-
-  input.parentElement.style.position = "relative";
-  input.parentElement.appendChild(dropdown);
-
-  input.addEventListener("input", () => {
-
-    console.log("🔥 typing:", input.value);
-
-    const query = input.value.trim().toLowerCase();
-
-    if (query.length < 1) {
-      dropdown.classList.add("hidden");
-      return;
-    }
-
-    const results = locations.filter(loc => {
-      return (loc.search || "").toLowerCase().includes(query);
+    box.innerHTML="";
+    res.forEach(l=>{
+      const o=document.createElement("div");
+      o.className="p-2 hover:bg-white/10 cursor-pointer";
+      o.innerText=`${l.code} - ${l.city}`;
+      o.onclick=()=>{
+        input.value=`${l.code} - ${l.city}`;
+        box.classList.add("hidden");
+      };
+      box.appendChild(o);
     });
 
-    console.log("🔥 results:", results);
-
-    dropdown.innerHTML = "";
-
-    results.slice(0,5).forEach(loc => {
-
-      const option = document.createElement("div");
-      option.className = "p-2 cursor-pointer";
-
-      option.innerText = `${loc.code} - ${loc.city}`;
-
-      dropdown.appendChild(option);
-    });
-
-    dropdown.classList.remove("hidden");
-  });
+    box.classList.remove("hidden");
+  };
 }
-
 
 </script>
 
