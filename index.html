@@ -675,18 +675,118 @@ document.getElementById("includeInland").onchange=e=>{
 };
 
 // SUBMIT
-form.onsubmit = (e) => {
+form.onsubmit = async (e) => {
   e.preventDefault();
 
-  const quoteNumber = generateQuoteNumber();
+  try {
 
-  document.getElementById("quoteNumber").value = quoteNumber;
+    // 🔹 1. Generate quote number
+    const quoteNumber = generateQuoteNumber();
+    document.getElementById("quoteNumber").value = quoteNumber;
 
-  console.log("QUOTE NUMBER:", quoteNumber);
+    // 🔹 2. Collect base form data
+    const data = new FormData(form);
+    const payload = {};
 
-  // 👉 here you will send webhook later
+    data.forEach((value, key) => {
+      payload[key] = value;
+    });
 
-  alert("Quote Generated: " + quoteNumber);
+    // 🔹 3. Add booleans manually
+    payload.isFTZ = document.getElementById("isFTZ").checked;
+    payload.isBonded = document.getElementById("isBonded").checked;
+    payload.includeInland = document.getElementById("includeInland").checked;
+
+// 🔹 PICKUP
+const pickupSection = document.querySelector("#inlandFields > div:first-child");
+
+payload.pickup = {
+  company: pickupSection.querySelectorAll("input")[0]?.value || "",
+  contact: pickupSection.querySelectorAll("input")[1]?.value || "",
+  phone: pickupSection.querySelectorAll("input")[2]?.value || "",
+  email: pickupSection.querySelectorAll("input")[3]?.value || "",
+  address: pickupSection.querySelectorAll("input")[4]?.value || "",
+  city: pickupSection.querySelectorAll("input")[5]?.value || "",
+  country: pickupSection.querySelectorAll("input")[6]?.value || "",
+  hours: pickupSection.querySelectorAll("input")[7]?.value || ""
+};
+
+// 🔹 DELIVERY
+const deliverySection = document.querySelector("#inlandFields > div:last-child");
+
+payload.delivery = {
+  company: deliverySection.querySelectorAll("input")[0]?.value || "",
+  contact: deliverySection.querySelectorAll("input")[1]?.value || "",
+  phone: deliverySection.querySelectorAll("input")[2]?.value || "",
+  email: deliverySection.querySelectorAll("input")[3]?.value || "",
+  address: deliverySection.querySelectorAll("input")[4]?.value || "",
+  city: deliverySection.querySelectorAll("input")[5]?.value || "",
+  country: deliverySection.querySelectorAll("input")[6]?.value || "",
+  hours: deliverySection.querySelectorAll("input")[7]?.value || ""
+};
+    
+
+    // 🔹 4. Collect cargo items
+    payload.cargo = [];
+
+    document.querySelectorAll(".cargo-item").forEach(item => {
+
+      const qty = parseFloat(item.querySelector(".qty")?.value) || 0;
+
+      let weight = parseFloat(item.querySelector(".weight")?.value) || 0;
+      const weightUnit = item.querySelector(".weightUnit")?.value;
+
+      let L = parseFloat(item.querySelector(".length")?.value) || 0;
+      let W = parseFloat(item.querySelector(".width")?.value) || 0;
+      let H = parseFloat(item.querySelector(".height")?.value) || 0;
+      const dimUnit = item.querySelector(".dimUnit")?.value;
+
+      // 🔹 normalize to metric
+      if (weightUnit === "lb") weight *= 0.453592;
+      if (dimUnit === "in") {
+        L *= 2.54;
+        W *= 2.54;
+        H *= 2.54;
+      }
+
+      const cbm = (L * W * H) / 1000000;
+
+      payload.cargo.push({
+        commodity: item.querySelector(".commodity")?.value || "",
+        packagingType: item.querySelector(".packagingType")?.value || "",
+        cargoType: item.querySelector(".cargoType")?.value || "",
+        qty,
+        weightKg: weight,
+        lengthCm: L,
+        widthCm: W,
+        heightCm: H,
+        cbm
+      });
+
+    });
+
+    console.log("SENDING PAYLOAD:", payload);
+
+    // 🔹 5. Send to n8n
+    const res = await fetch("https://n8n-n10ai.onrender.com/webhook/new-design-pricing", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await res.json();
+
+    console.log("N8N RESPONSE:", result);
+
+    alert("Quote submitted successfully: " + quoteNumber);
+
+  } catch (err) {
+    console.error(err);
+    alert("Error submitting quote");
+  }
+
 };
 
 // INTRO FIX
