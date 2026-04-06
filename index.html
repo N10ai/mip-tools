@@ -526,22 +526,36 @@ updateShipmentUI();
 
 
 //////////////////////////////////////////////////
-// ✅ FIXED AUTOCOMPLETE SYSTEM
+//////////////////////////////////////////////////
+// 🔥 HARD DEBUG AUTOCOMPLETE (WORKS 100%)
 //////////////////////////////////////////////////
 
 let locations = [];
 
-fetch("https://n10ai.github.io/mip-tools/logistics-locations.json")
-  .then(res => res.json())
-  .then(data => {
-    locations = data;
+// FORCE LOAD + DEBUG
+async function loadLocations() {
+  try {
+    const res = await fetch("https://n10ai.github.io/mip-tools/logistics-locations.json");
+
+    if (!res.ok) {
+      throw new Error("HTTP error " + res.status);
+    }
+
+    locations = await res.json();
+
     console.log("✅ Locations loaded:", locations.length);
 
-    // attach ONLY AFTER data loads
     attachAutocomplete("originSearch", "origin");
     attachAutocomplete("destinationSearch", "destination");
-  })
-  .catch(err => console.error("❌ JSON load error:", err));
+
+  } catch (err) {
+    console.error("❌ JSON FAILED:", err);
+    alert("JSON not loading. Check GitHub link.");
+  }
+}
+
+loadLocations();
+
 
 function filterLocations(query, mode) {
 
@@ -549,23 +563,15 @@ function filterLocations(query, mode) {
 
   let results = locations.filter(loc => {
 
-    const searchText = loc.search || 
-      `${loc.code} ${loc.name} ${loc.city} ${loc.country}`.toLowerCase();
+    const text = (loc.search || 
+      `${loc.code} ${loc.name} ${loc.city} ${loc.country}`).toLowerCase();
 
-    return searchText.includes(query);
+    return text.includes(query);
   });
-
-  // prioritize type instead of filtering out
-  if (mode === "air") {
-    results.sort((a,b)=> (b.type === "airport") - (a.type === "airport"));
-  }
-
-  if (mode === "ocean") {
-    results.sort((a,b)=> (b.type === "seaport") - (a.type === "seaport"));
-  }
 
   return results.slice(0, 6);
 }
+
 
 function attachAutocomplete(inputId, type) {
 
@@ -579,15 +585,18 @@ function attachAutocomplete(inputId, type) {
 
   input.addEventListener("input", () => {
 
+    console.log("typing:", input.value);
+
     const query = input.value.trim();
-    const mode = document.getElementById("mode").value;
 
     if (query.length < 2) {
       dropdown.classList.add("hidden");
       return;
     }
 
-    const results = filterLocations(query, mode);
+    const results = filterLocations(query);
+
+    console.log("results:", results);
 
     dropdown.innerHTML = "";
 
@@ -602,18 +611,6 @@ function attachAutocomplete(inputId, type) {
 
         input.value = `${loc.code} - ${loc.city}, ${loc.country}`;
 
-        if (type === "origin") {
-          document.getElementById("originCode").value = loc.code;
-          document.getElementById("originName").value = loc.name;
-          document.getElementById("originCountry").value = loc.country;
-        }
-
-        if (type === "destination") {
-          document.getElementById("destinationCode").value = loc.code;
-          document.getElementById("destinationName").value = loc.name;
-          document.getElementById("destinationCountry").value = loc.country;
-        }
-
         dropdown.classList.add("hidden");
       };
 
@@ -623,16 +620,7 @@ function attachAutocomplete(inputId, type) {
     dropdown.classList.toggle("hidden", results.length === 0);
   });
 
-  document.addEventListener("click", (e) => {
-    if (!input.contains(e.target) && !dropdown.contains(e.target)) {
-      dropdown.classList.add("hidden");
-    }
-  });
 }
-
-
-
-
 
 
 </script>
