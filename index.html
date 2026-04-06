@@ -712,6 +712,14 @@ document.addEventListener("DOMContentLoaded", () => {
   loadLocations();
 });
 
+  function getAllowedTypes() {
+  const mode = document.getElementById("mode").value;
+
+  if (mode === "air") return ["airport"];
+  if (mode === "ocean") return ["seaport", "port"];
+  return null; // ground = no filter
+}
+  
 function attachAutocomplete(inputId, type) {
   const input = document.getElementById(inputId);
   if (!input) return;
@@ -752,9 +760,18 @@ function attachAutocomplete(inputId, type) {
       return;
     }
 
-    let results = locations.filter(loc =>
-      (loc.search || "").toLowerCase().includes(query)
-    );
+const allowedTypes = getAllowedTypes();
+
+let results = locations.filter(loc => {
+
+  const matchesSearch =
+    (loc.search || "").toLowerCase().includes(query);
+
+  const matchesType =
+    !allowedTypes || allowedTypes.includes(loc.type);
+
+  return matchesSearch && matchesType;
+});
 
     results = results.slice(0, 8);
 
