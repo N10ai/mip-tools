@@ -480,9 +480,16 @@ document.getElementById("addCargo").onclick = () => {
   const index = document.querySelectorAll("#cargoItems > div").length + 1;
 
   div.innerHTML = `
-  <div class="glass p-4 rounded-xl mb-3">
+  <div class="glass p-4 rounded-xl mb-3 relative">
 
-    <div class="text-sm mb-2 text-blue-300 font-semibold">
+    <!-- DELETE BUTTON -->
+    <button type="button"
+      class="absolute top-2 right-2 text-xs bg-red-500/20 hover:bg-red-500/40 px-2 py-1 rounded text-red-300"
+      onclick="this.closest('.cargo-item').remove(); updateCargoNumbers();">
+      ✕
+    </button>
+
+    <div class="text-sm mb-2 text-blue-300 font-semibold cargo-title">
       Item #${index}
     </div>
 
@@ -513,9 +520,25 @@ document.getElementById("addCargo").onclick = () => {
   </div>
   `;
 
+  // IMPORTANT: add class for deletion targeting
+  div.firstElementChild.classList.add("cargo-item");
+
   document.getElementById("cargoItems").appendChild(div);
 };
 
+function updateCargoNumbers() {
+  const items = document.querySelectorAll(".cargo-item");
+
+  items.forEach((item, index) => {
+    const title = item.querySelector(".cargo-title");
+    if (title) {
+      title.innerText = `Item #${index + 1}`;
+    }
+  });
+}
+
+
+  
 // SUMMARY
 const form=document.getElementById("quoteForm");
 
