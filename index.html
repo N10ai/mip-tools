@@ -202,31 +202,7 @@ No back-and-forth. No delays.
 
 <!-- STEP 0: CONTACT -->
 <div class="step active">
-  <div class="grid grid-cols-1 gap-4"><div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-  <div>
-    <label class="text-xs text-gray-400 mb-1 block">From</label>
-    <input
-      id="originSearch"
-      name="originSearch"
-      class="input p-3 rounded-lg w-full"
-      autocomplete="off"
-      placeholder="Origin Airport / Port / City"
-    >
-  </div>
-
-  <div>
-    <label class="text-xs text-gray-400 mb-1 block">To</label>
-    <input
-      id="destinationSearch"
-      name="destinationSearch"
-      class="input p-3 rounded-lg w-full"
-      autocomplete="off"
-      placeholder="Destination Airport / Port / City"
-    >
-  </div>
-
-</div>
     <input
       name="referenceNumber"
       class="input p-3 rounded-lg"
@@ -251,6 +227,31 @@ No back-and-forth. No delays.
 <div class="step">
 <div class="text-xs text-gray-400 mb-2">
 Route
+    <div class="grid grid-cols-1 gap-4"><div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+  <div>
+    <label class="text-xs text-gray-400 mb-1 block">From</label>
+    <input
+      id="originSearch"
+      name="originSearch"
+      class="input p-3 rounded-lg w-full"
+      autocomplete="off"
+      placeholder="Origin Airport / Port / City"
+    >
+  </div>
+
+  <div>
+    <label class="text-xs text-gray-400 mb-1 block">To</label>
+    <input
+      id="destinationSearch"
+      name="destinationSearch"
+      class="input p-3 rounded-lg w-full"
+      autocomplete="off"
+      placeholder="Destination Airport / Port / City"
+    >
+  </div>
+
+</div>
 </div>
 <!-- MODE -->
 <select id="mode" name="mode" class="input p-3 rounded-lg w-full mb-4">
@@ -472,42 +473,48 @@ document.querySelectorAll(".tab").forEach(tab=>{
 });
 
 // CARGO
-document.getElementById("addCargo").onclick = ()=>{
-const index = document.querySelectorAll("#cargoItems > div").length + 1;
+document.getElementById("addCargo").onclick = () => {
 
-div.innerHTML = `
-<div class="glass p-4 rounded-xl">
+  const div = document.createElement("div");
 
-  <div class="text-sm mb-2 text-blue-300 font-semibold">
-    Item #${index}
+  const index = document.querySelectorAll("#cargoItems > div").length + 1;
+
+  div.innerHTML = `
+  <div class="glass p-4 rounded-xl mb-3">
+
+    <div class="text-sm mb-2 text-blue-300 font-semibold">
+      Item #${index}
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-6 gap-2">
+
+      <input class="input p-2 rounded qty" placeholder="Qty">
+
+      <input class="input p-2 rounded weight" placeholder="Weight">
+
+      <select class="input p-2 rounded weightUnit">
+        <option value="kg">kg</option>
+        <option value="lb">lb</option>
+      </select>
+
+      <input class="input p-2 rounded length" placeholder="L">
+
+      <input class="input p-2 rounded width" placeholder="W">
+
+      <input class="input p-2 rounded height" placeholder="H">
+
+      <select class="input p-2 rounded dimUnit col-span-2 md:col-span-1">
+        <option value="cm">cm</option>
+        <option value="in">in</option>
+      </select>
+
+    </div>
+
   </div>
+  `;
 
-  <div class="grid grid-cols-2 md:grid-cols-6 gap-2">
-
-    <input class="input p-2 rounded qty" placeholder="Qty">
-
-    <input class="input p-2 rounded weight" placeholder="Weight">
-
-    <select class="input p-2 rounded weightUnit">
-      <option value="kg">kg</option>
-      <option value="lb">lb</option>
-    </select>
-
-    <input class="input p-2 rounded length" placeholder="L">
-
-    <input class="input p-2 rounded width" placeholder="W">
-
-    <input class="input p-2 rounded height" placeholder="H">
-
-    <select class="input p-2 rounded dimUnit col-span-2 md:col-span-1">
-      <option value="cm">cm</option>
-      <option value="in">in</option>
-    </select>
-
-  </div>
-
-</div>
-`;
+  document.getElementById("cargoItems").appendChild(div);
+};
 
 // SUMMARY
 const form=document.getElementById("quoteForm");
