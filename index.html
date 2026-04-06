@@ -479,46 +479,82 @@ document.getElementById("addCargo").onclick = () => {
 
  const index = document.querySelectorAll(".cargo-item").length + 1;
 
-  div.innerHTML = `
+div.innerHTML = `
 <div class="glass p-4 rounded-xl mb-3 relative cargo-item">
 
-    <!-- DELETE BUTTON -->
-    <button type="button"
-      class="absolute top-2 right-2 text-xs bg-red-500/20 hover:bg-red-500/40 px-2 py-1 rounded text-red-300"
-      onclick="this.closest('.cargo-item').remove(); updateCargoNumbers();">
-      ✕
-    </button>
+  <!-- DELETE BUTTON -->
+  <button type="button"
+    class="absolute top-2 right-2 text-xs bg-red-500/20 hover:bg-red-500/40 px-2 py-1 rounded text-red-300"
+    onclick="this.closest('.cargo-item').remove(); updateCargoNumbers();">
+    ✕
+  </button>
 
-    <div class="text-sm mb-2 text-blue-300 font-semibold cargo-title">
-      Item #${index}
-    </div>
+  <!-- TITLE -->
+  <div class="text-sm mb-2 text-blue-300 font-semibold cargo-title">
+    Item #${index}
+  </div>
+<div class="text-xs text-gray-400 mb-1">
+  Classification
+</div>
+  <!-- NEW FIELDS -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3">
 
-    <div class="grid grid-cols-2 md:grid-cols-6 gap-2">
+    <!-- Cargo Type -->
+    <select class="input p-2 rounded cargoType">
+      <option value="">Cargo Type</option>
+      <option value="general">General Cargo</option>
+      <option value="dg">Dangerous Goods</option>
+      <option value="hazmat">Hazmat</option>
+      <option value="oversized">Oversized</option>
+      <option value="overweight">Overweight</option>
+    </select>
 
-      <input class="input p-2 rounded qty" placeholder="Qty">
+    <!-- Packaging -->
+    <select class="input p-2 rounded packagingType">
+      <option value="">Packaging</option>
+      <option value="pallet">Pallet</option>
+      <option value="box">Box</option>
+      <option value="skid">Skid</option>
+      <option value="crate">Crate</option>
+      <option value="drum">Drum</option>
+      <option value="bag">Bag</option>
+    </select>
 
-      <input class="input p-2 rounded weight" placeholder="Weight">
-
-      <select class="input p-2 rounded weightUnit">
-        <option value="kg">kg</option>
-        <option value="lb">lb</option>
-      </select>
-
-      <input class="input p-2 rounded length" placeholder="L">
-
-      <input class="input p-2 rounded width" placeholder="W">
-
-      <input class="input p-2 rounded height" placeholder="H">
-
-      <select class="input p-2 rounded dimUnit col-span-2 md:col-span-1">
-        <option value="cm">cm</option>
-        <option value="in">in</option>
-      </select>
-
-    </div>
+    <!-- Commodity -->
+    <input class="input p-2 rounded commodity" placeholder="Commodity (e.g. Apparel, Electronics)">
 
   </div>
-  `;
+
+  <!-- EXISTING FIELDS -->
+  <div class="grid grid-cols-2 md:grid-cols-6 gap-2">
+
+    <input class="input p-2 rounded qty" placeholder="Qty">
+
+    <input class="input p-2 rounded weight" placeholder="Weight">
+
+    <select class="input p-2 rounded weightUnit">
+      <option value="kg">kg</option>
+      <option value="lb">lb</option>
+    </select>
+
+<div class="text-xs text-gray-400 mt-3 mb-1">
+  Dimensions & Weight
+</div>
+    <input class="input p-2 rounded length" placeholder="L">
+
+    <input class="input p-2 rounded width" placeholder="W">
+
+    <input class="input p-2 rounded height" placeholder="H">
+
+    <select class="input p-2 rounded dimUnit col-span-2 md:col-span-1">
+      <option value="cm">cm</option>
+      <option value="in">in</option>
+    </select>
+
+  </div>
+
+</div>
+`;
 
   // IMPORTANT: add class for deletion targeting
 
