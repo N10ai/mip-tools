@@ -549,7 +549,7 @@ let locations = [];
 
 async function loadLocations() {
   try {
-    const res = await fetch("https://n10ai.github.io/mip-tools/logistics-locations.json");
+    const res = await fetch(logistics-locations.json);
     locations = await res.json();
 
     document.getElementById("debugBox").innerText =
