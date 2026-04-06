@@ -692,15 +692,7 @@ form.onsubmit = async (e) => {
       payload[key] = value;
     });
 
-if (!payload.email) {
-  alert("Email is required");
-  return;
-}
 
-if (payload.cargo.length === 0) {
-  alert("Please add at least one cargo item");
-  return;
-}
 
     
     // 🔹 3. Booleans
@@ -751,6 +743,17 @@ payload.delivery = {
       let H = parseFloat(item.querySelector(".height")?.value) || 0;
       const dimUnit = item.querySelector(".dimUnit")?.value;
 
+if (!payload.email) {
+  alert("Email is required");
+  return;
+}
+
+if (payload.cargo.length === 0) {
+  alert("Please add at least one cargo item");
+  return;
+}
+
+      
       // 🔹 FULL CONVERSIONS
       const weightKg = weightUnit === "lb" ? weight * 0.453592 : weight;
       const weightLb = weightUnit === "kg" ? weight * 2.20462 : weight;
