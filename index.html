@@ -369,6 +369,10 @@ Submit Quote
 </div>
 
 </div>
+
+
+<div id="debugBox" class="text-xs text-yellow-300 mt-4"></div>
+
 </form>
 
 <script>
@@ -547,12 +551,16 @@ async function loadLocations() {
   try {
     const res = await fetch("https://raw.githubusercontent.com/N10ai/mip-tools/main/logistics-locations.json");
     locations = await res.json();
-    console.log("✅ Locations loaded:", locations.length);
+
+    document.getElementById("debugBox").innerText =
+      "Loaded locations: " + locations.length;
 
     attachAutocomplete("originSearch", "origin");
     attachAutocomplete("destinationSearch", "destination");
+
   } catch (err) {
-    console.error("❌ JSON FAILED:", err);
+    document.getElementById("debugBox").innerText =
+      "ERROR loading JSON";
   }
 }
 
@@ -564,30 +572,22 @@ function attachAutocomplete(inputId, type) {
 
   const input = document.getElementById(inputId);
 
-  // 🔥 create dropdown OUTSIDE stacking issues
   const dropdown = document.createElement("div");
-
   dropdown.style.position = "fixed";
   dropdown.style.zIndex = "99999";
-  dropdown.style.background = "#020617";
-  dropdown.style.border = "1px solid rgba(255,255,255,0.1)";
+  dropdown.style.background = "#111";
+  dropdown.style.color = "#fff";
+  dropdown.style.border = "1px solid #444";
   dropdown.style.borderRadius = "8px";
-  dropdown.style.fontSize = "14px";
   dropdown.style.display = "none";
-  dropdown.style.maxHeight = "250px";
+  dropdown.style.maxHeight = "200px";
   dropdown.style.overflowY = "auto";
-  dropdown.style.width = input.offsetWidth + "px";
 
   document.body.appendChild(dropdown);
 
   input.addEventListener("input", () => {
 
-    const query = input.value.toLowerCase().trim();
-
-    if (!query) {
-      dropdown.style.display = "none";
-      return;
-    }
+    const query = input.value.toLowerCase();
 
     const rect = input.getBoundingClientRect();
 
@@ -595,62 +595,39 @@ function attachAutocomplete(inputId, type) {
     dropdown.style.left = rect.left + "px";
     dropdown.style.width = rect.width + "px";
 
-    const results = locations.filter(loc => {
+    let results = locations.filter(loc => {
+      return (
+        (loc.code || "").toLowerCase().includes(query) ||
+        (loc.city || "").toLowerCase().includes(query) ||
+        (loc.name || "").toLowerCase().includes(query) ||
+        (loc.country || "").toLowerCase().includes(query)
+      );
+    });
 
-      const text = `${loc.code} ${loc.name} ${loc.city} ${loc.country}`.toLowerCase();
-
-      return text.includes(query);
-
-    }).slice(0, 6);
+    // 🔥 fallback (critical for debugging)
+    if (results.length === 0) {
+      results = locations.slice(0,5);
+    }
 
     dropdown.innerHTML = "";
 
-    if (results.length === 0) {
-      dropdown.innerHTML = `<div style="padding:8px;color:#aaa;">No results</div>`;
-      dropdown.style.display = "block";
-      return;
-    }
+    results.slice(0,5).forEach(loc => {
 
-    results.forEach(loc => {
+      const item = document.createElement("div");
+      item.style.padding = "8px";
+      item.style.cursor = "pointer";
 
-      const option = document.createElement("div");
+      item.innerText = `${loc.code} - ${loc.city}`;
 
-      option.style.padding = "8px";
-      option.style.cursor = "pointer";
-
-      option.innerHTML = `<b>${loc.code}</b> — ${loc.city}, ${loc.country}`;
-
-      option.onmouseenter = () => option.style.background = "rgba(255,255,255,0.1)";
-      option.onmouseleave = () => option.style.background = "transparent";
-
-      option.onmousedown = (e) => {
-        e.preventDefault();
-
-        input.value = `${loc.code} - ${loc.city}, ${loc.country}`;
-
-        if (type === "origin") {
-          originCode.value = loc.code || "";
-          originName.value = loc.name || "";
-          originCountry.value = loc.country || "";
-        } else {
-          destinationCode.value = loc.code || "";
-          destinationName.value = loc.name || "";
-          destinationCountry.value = loc.country || "";
-        }
-
+      item.onmousedown = () => {
+        input.value = `${loc.code} - ${loc.city}`;
         dropdown.style.display = "none";
       };
 
-      dropdown.appendChild(option);
+      dropdown.appendChild(item);
     });
 
     dropdown.style.display = "block";
-  });
-
-  document.addEventListener("click", (e) => {
-    if (e.target !== input) {
-      dropdown.style.display = "none";
-    }
   });
 }
 
