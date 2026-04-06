@@ -477,10 +477,10 @@ document.getElementById("addCargo").onclick = () => {
 
   const div = document.createElement("div");
 
-  const index = document.querySelectorAll("#cargoItems > div").length + 1;
+ const index = document.querySelectorAll(".cargo-item").length + 1;
 
   div.innerHTML = `
-  <div class="glass p-4 rounded-xl mb-3 relative">
+<div class="glass p-4 rounded-xl mb-3 relative cargo-item">
 
     <!-- DELETE BUTTON -->
     <button type="button"
@@ -521,7 +521,7 @@ document.getElementById("addCargo").onclick = () => {
   `;
 
   // IMPORTANT: add class for deletion targeting
-  div.firstElementChild.classList.add("cargo-item");
+
 
   document.getElementById("cargoItems").appendChild(div);
 };
@@ -615,14 +615,16 @@ const airOceanFields = document.getElementById("airOceanFields");
 const groundFields = document.getElementById("groundFields");
 
 function updateShipmentUI() {
-const routeSection = document.getElementById("routeSection");
 
-if (mode) {
-  routeSection.classList.remove("hidden");
-} else {
-  routeSection.classList.add("hidden");
-}
-  const mode = modeEl.value;
+  const mode = modeEl.value; // ✅ MOVE THIS FIRST
+  const routeSection = document.getElementById("routeSection");
+
+  // SHOW ROUTE ONLY IF MODE SELECTED
+  if (mode) {
+    routeSection.classList.remove("hidden");
+  } else {
+    routeSection.classList.add("hidden");
+  }
 
   serviceWrap.classList.add("hidden");
   containerWrap.classList.add("hidden");
@@ -654,13 +656,6 @@ if (mode) {
 
   form.dispatchEvent(new Event("input"));
 }
-
-serviceEl.addEventListener("change", () => {
-  containerWrap.classList.toggle("hidden", serviceEl.value !== "fcl");
-});
-
-modeEl.addEventListener("change", updateShipmentUI);
-updateShipmentUI();
 
 
 
