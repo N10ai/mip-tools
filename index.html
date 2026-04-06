@@ -13,6 +13,16 @@
   position: relative;
   z-index: 1;
 }
+/* 🔥 ADD THIS RIGHT HERE */
+.relative {
+  position: relative;
+  z-index: 9999;
+}
+
+.glass {
+  overflow: visible !important;
+}
+
 
 input {
   position: relative;
@@ -554,7 +564,7 @@ function attachAutocomplete(inputId, type) {
 
   const dropdown = document.createElement("div");
   dropdown.className =
-    "absolute left-0 top-full z-[9999] mt-1 w-full bg-slate-900 border border-white/10 rounded-lg shadow-xl text-sm hidden max-h-64 overflow-y-auto";
+    "absolute left-0 top-full mt-1 w-full bg-slate-900 border border-white/10 rounded-lg shadow-xl text-sm hidden max-h-64 overflow-y-auto";
 
   wrapper.appendChild(dropdown);
 
@@ -562,21 +572,23 @@ function attachAutocomplete(inputId, type) {
 
     const query = input.value.trim().toLowerCase();
 
-    if (query.length < 1) {
+    if (!query) {
       dropdown.classList.add("hidden");
       return;
     }
 
     const results = locations.filter(loc => {
-      return (
-        (loc.code && loc.code.toLowerCase().includes(query)) ||
-        (loc.city && loc.city.toLowerCase().includes(query)) ||
-        (loc.name && loc.name.toLowerCase().includes(query)) ||
-        (loc.country && loc.country.toLowerCase().includes(query))
-      );
+      const text = `${loc.code} ${loc.name} ${loc.city} ${loc.country}`.toLowerCase();
+      return text.includes(query);
     }).slice(0, 8);
 
     dropdown.innerHTML = "";
+
+    if (results.length === 0) {
+      dropdown.innerHTML = `<div class="p-2 text-gray-400">No results</div>`;
+      dropdown.classList.remove("hidden");
+      return;
+    }
 
     results.forEach(loc => {
 
@@ -585,22 +597,23 @@ function attachAutocomplete(inputId, type) {
 
       option.innerHTML = `<b>${loc.code}</b> — ${loc.city}, ${loc.country}`;
 
-      option.onclick = () => {
+      option.addEventListener("mousedown", (e) => {
+        e.preventDefault(); // 🔥 IMPORTANT FIX
 
         input.value = `${loc.code} - ${loc.city}, ${loc.country}`;
 
         if (type === "origin") {
-          document.getElementById("originCode").value = loc.code || "";
-          document.getElementById("originName").value = loc.name || "";
-          document.getElementById("originCountry").value = loc.country || "";
+          originCode.value = loc.code || "";
+          originName.value = loc.name || "";
+          originCountry.value = loc.country || "";
         } else {
-          document.getElementById("destinationCode").value = loc.code || "";
-          document.getElementById("destinationName").value = loc.name || "";
-          document.getElementById("destinationCountry").value = loc.country || "";
+          destinationCode.value = loc.code || "";
+          destinationName.value = loc.name || "";
+          destinationCountry.value = loc.country || "";
         }
 
         dropdown.classList.add("hidden");
-      };
+      });
 
       dropdown.appendChild(option);
     });
