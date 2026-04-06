@@ -547,20 +547,21 @@ function filterLocations(query, mode) {
 
   query = query.toLowerCase();
 
-  let results = locations.filter(loc =>
-    loc.code?.toLowerCase().includes(query) ||
-    loc.name?.toLowerCase().includes(query) ||
-    loc.city?.toLowerCase().includes(query) ||
-    loc.country?.toLowerCase().includes(query)
-  );
+  let results = locations.filter(loc => {
 
-  // prioritize instead of blocking
+    const searchText = loc.search || 
+      `${loc.code} ${loc.name} ${loc.city} ${loc.country}`.toLowerCase();
+
+    return searchText.includes(query);
+  });
+
+  // prioritize type instead of filtering out
   if (mode === "air") {
-    results = results.sort((a, b) => (b.type === "airport") - (a.type === "airport"));
+    results.sort((a,b)=> (b.type === "airport") - (a.type === "airport"));
   }
 
   if (mode === "ocean") {
-    results = results.sort((a, b) => (b.type === "seaport") - (a.type === "seaport"));
+    results.sort((a,b)=> (b.type === "seaport") - (a.type === "seaport"));
   }
 
   return results.slice(0, 6);
