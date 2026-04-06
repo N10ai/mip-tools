@@ -216,23 +216,29 @@ No back-and-forth. No delays.
 <!-- AIR / OCEAN ROUTE -->
 <div id="airOceanFields">
 
-  <div class="grid grid-cols-1 gap-4">
+<div class="grid grid-cols-1 gap-4">
 
+  <div class="relative">
     <input
       id="originSearch"
       name="originSearch"
-      class="input p-3 rounded-lg"
+      class="input p-3 rounded-lg w-full"
+      autocomplete="off"
       placeholder="Origin Airport / Port / City"
     >
+  </div>
 
+  <div class="relative">
     <input
       id="destinationSearch"
       name="destinationSearch"
-      class="input p-3 rounded-lg"
+      class="input p-3 rounded-lg w-full"
+      autocomplete="off"
       placeholder="Destination Airport / Port / City"
     >
-
   </div>
+
+</div>
 
   <!-- hidden structured fields for later autocomplete/JSON hookup -->
   <input type="hidden" id="originCode" name="originCode">
@@ -537,22 +543,19 @@ updateShipmentUI();
 
 
 //////////////////////////////////////////////////
-// ✅ FIXED AUTOCOMPLETE (ONLY THIS SECTION UPDATED)
+// AUTOCOMPLETE — FIXED
 //////////////////////////////////////////////////
 
 let locations = [];
 
 async function loadLocations() {
   try {
-
     const res = await fetch("https://raw.githubusercontent.com/N10ai/mip-tools/main/logistics-locations.json");
     locations = await res.json();
-
     console.log("✅ Locations loaded:", locations.length);
 
     attachAutocomplete("originSearch", "origin");
     attachAutocomplete("destinationSearch", "destination");
-
   } catch (err) {
     console.error("❌ JSON FAILED:", err);
   }
@@ -560,23 +563,21 @@ async function loadLocations() {
 
 loadLocations();
 
-
 function attachAutocomplete(inputId, type) {
-
   const input = document.getElementById(inputId);
+  const wrapper = input.parentElement;
 
   const dropdown = document.createElement("div");
-  dropdown.className = "absolute z-[9999] bg-slate-900 border border-white/10 rounded-lg mt-1 w-full text-sm shadow-xl hidden";
-
-  input.parentElement.style.position = "relative";
-  input.parentElement.appendChild(dropdown);
+  dropdown.className =
+    "absolute left-0 top-full z-[9999] mt-1 w-full bg-slate-900 border border-white/10 rounded-lg shadow-xl text-sm hidden max-h-64 overflow-y-auto";
+  wrapper.appendChild(dropdown);
 
   input.addEventListener("input", () => {
-
     const query = input.value.trim().toLowerCase();
 
     if (query.length < 2) {
       dropdown.classList.add("hidden");
+      dropdown.innerHTML = "";
       return;
     }
 
@@ -589,39 +590,38 @@ function attachAutocomplete(inputId, type) {
 
         return text.includes(query);
       })
-      .slice(0, 6);
+      .slice(0, 8);
 
     dropdown.innerHTML = "";
 
     if (results.length === 0) {
       dropdown.innerHTML = `<div class="p-2 text-gray-400">No results</div>`;
+      dropdown.classList.remove("hidden");
+      return;
     }
 
     results.forEach(loc => {
-
-      const option = document.createElement("div");
-      option.className = "p-2 cursor-pointer hover:bg-white/10";
+      const option = document.createElement("button");
+      option.type = "button";
+      option.className = "block w-full text-left p-2 hover:bg-white/10";
 
       option.innerHTML = `<b>${loc.code}</b> — ${loc.city}, ${loc.country}`;
 
-      option.onclick = () => {
-
+      option.addEventListener("click", () => {
         input.value = `${loc.code} - ${loc.city}, ${loc.country}`;
 
         if (type === "origin") {
-          document.getElementById("originCode").value = loc.code;
-          document.getElementById("originName").value = loc.name;
-          document.getElementById("originCountry").value = loc.country;
-        }
-
-        if (type === "destination") {
-          document.getElementById("destinationCode").value = loc.code;
-          document.getElementById("destinationName").value = loc.name;
-          document.getElementById("destinationCountry").value = loc.country;
+          document.getElementById("originCode").value = loc.code || "";
+          document.getElementById("originName").value = loc.name || "";
+          document.getElementById("originCountry").value = loc.country || "";
+        } else {
+          document.getElementById("destinationCode").value = loc.code || "";
+          document.getElementById("destinationName").value = loc.name || "";
+          document.getElementById("destinationCountry").value = loc.country || "";
         }
 
         dropdown.classList.add("hidden");
-      };
+      });
 
       dropdown.appendChild(option);
     });
@@ -629,8 +629,14 @@ function attachAutocomplete(inputId, type) {
     dropdown.classList.remove("hidden");
   });
 
+  input.addEventListener("focus", () => {
+    if (dropdown.innerHTML.trim() !== "") {
+      dropdown.classList.remove("hidden");
+    }
+  });
+
   document.addEventListener("click", (e) => {
-    if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+    if (!wrapper.contains(e.target)) {
       dropdown.classList.add("hidden");
     }
   });
