@@ -537,20 +537,16 @@ updateShipmentUI();
 
 
 //////////////////////////////////////////////////
-//////////////////////////////////////////////////
-// 🔥 HARD DEBUG AUTOCOMPLETE (WORKS 100%)
+// ✅ FIXED AUTOCOMPLETE (ONLY THIS SECTION UPDATED)
 //////////////////////////////////////////////////
 
 let locations = [];
 
-// FORCE LOAD + DEBUG
 async function loadLocations() {
   try {
 
     const res = await fetch("https://raw.githubusercontent.com/N10ai/mip-tools/main/logistics-locations.json");
-
-    const text = await res.text(); // 🔥 key fix
-    locations = JSON.parse(text);
+    locations = await res.json();
 
     console.log("✅ Locations loaded:", locations.length);
 
@@ -565,62 +561,78 @@ async function loadLocations() {
 loadLocations();
 
 
-function filterLocations(query, mode) {
-
-  query = query.toLowerCase();
-
-  let results = locations.filter(loc => {
-
-    const text = (loc.search || 
-      `${loc.code} ${loc.name} ${loc.city} ${loc.country}`).toLowerCase();
-
-    return text.includes(query);
-  });
-
-  return results.slice(0, 6);
-}
-
-
 function attachAutocomplete(inputId, type) {
 
   const input = document.getElementById(inputId);
 
   const dropdown = document.createElement("div");
-  dropdown.className = "absolute z-[9999] bg-red-500 text-white mt-1 w-full text-sm hidden";
+  dropdown.className = "absolute z-[9999] bg-slate-900 border border-white/10 rounded-lg mt-1 w-full text-sm shadow-xl hidden";
 
   input.parentElement.style.position = "relative";
   input.parentElement.appendChild(dropdown);
 
   input.addEventListener("input", () => {
 
-    console.log("🔥 typing:", input.value);
-
     const query = input.value.trim().toLowerCase();
 
-    if (query.length < 1) {
+    if (query.length < 2) {
       dropdown.classList.add("hidden");
       return;
     }
 
-    const results = locations.filter(loc => {
-      return (loc.search || "").toLowerCase().includes(query);
-    });
+    const results = locations
+      .filter(loc => {
+        const text = (
+          loc.search ||
+          `${loc.code} ${loc.name} ${loc.city} ${loc.country}`
+        ).toLowerCase();
 
-    console.log("🔥 results:", results);
+        return text.includes(query);
+      })
+      .slice(0, 6);
 
     dropdown.innerHTML = "";
 
-    results.slice(0,5).forEach(loc => {
+    if (results.length === 0) {
+      dropdown.innerHTML = `<div class="p-2 text-gray-400">No results</div>`;
+    }
+
+    results.forEach(loc => {
 
       const option = document.createElement("div");
-      option.className = "p-2 cursor-pointer";
+      option.className = "p-2 cursor-pointer hover:bg-white/10";
 
-      option.innerText = `${loc.code} - ${loc.city}`;
+      option.innerHTML = `<b>${loc.code}</b> — ${loc.city}, ${loc.country}`;
+
+      option.onclick = () => {
+
+        input.value = `${loc.code} - ${loc.city}, ${loc.country}`;
+
+        if (type === "origin") {
+          document.getElementById("originCode").value = loc.code;
+          document.getElementById("originName").value = loc.name;
+          document.getElementById("originCountry").value = loc.country;
+        }
+
+        if (type === "destination") {
+          document.getElementById("destinationCode").value = loc.code;
+          document.getElementById("destinationName").value = loc.name;
+          document.getElementById("destinationCountry").value = loc.country;
+        }
+
+        dropdown.classList.add("hidden");
+      };
 
       dropdown.appendChild(option);
     });
 
     dropdown.classList.remove("hidden");
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+      dropdown.classList.add("hidden");
+    }
   });
 }
 
