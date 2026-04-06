@@ -535,13 +535,11 @@ let locations = [];
 // FORCE LOAD + DEBUG
 async function loadLocations() {
   try {
-    const res = await fetch("https://n10ai.github.io/mip-tools/logistics-locations.json");
 
-    if (!res.ok) {
-      throw new Error("HTTP error " + res.status);
-    }
+    const res = await fetch("https://raw.githubusercontent.com/N10ai/mip-tools/main/logistics-locations.json");
 
-    locations = await res.json();
+    const text = await res.text(); // 🔥 key fix
+    locations = JSON.parse(text);
 
     console.log("✅ Locations loaded:", locations.length);
 
@@ -550,7 +548,6 @@ async function loadLocations() {
 
   } catch (err) {
     console.error("❌ JSON FAILED:", err);
-    alert("JSON not loading. Check GitHub link.");
   }
 }
 
