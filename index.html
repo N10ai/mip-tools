@@ -570,7 +570,8 @@ div.innerHTML = `
 
   document.getElementById("cargoItems").appendChild(div);
 };
-
+calculateTotals();
+  
 function updateCargoNumbers() {
   const items = document.querySelectorAll(".cargo-item");
 
@@ -888,6 +889,70 @@ let results = locations.filter(loc => {
 }
 
 
+//TOTAL CALCULATIONS  WEIGHT - VOLUME
+
+  function calculateTotals() {
+
+  const items = document.querySelectorAll(".cargo-item");
+
+  let totalWeight = 0;
+  let totalVolume = 0;
+
+  items.forEach(item => {
+
+    const qty = parseFloat(item.querySelector(".qty")?.value) || 0;
+    const weight = parseFloat(item.querySelector(".weight")?.value) || 0;
+    const weightUnit = item.querySelector(".weightUnit")?.value;
+
+    const L = parseFloat(item.querySelector(".length")?.value) || 0;
+    const W = parseFloat(item.querySelector(".width")?.value) || 0;
+    const H = parseFloat(item.querySelector(".height")?.value) || 0;
+    const dimUnit = item.querySelector(".dimUnit")?.value;
+
+    // 🔹 Convert weight to KG
+    let weightKg = weight;
+    if (weightUnit === "lb") weightKg = weight * 0.453592;
+
+    // 🔹 Volume calculation
+    let volumeCBM = 0;
+
+    if (dimUnit === "cm") {
+      volumeCBM = (L * W * H) / 1000000;
+    }
+
+    if (dimUnit === "in") {
+      volumeCBM = (L * W * H) / 1728 * 0.0283168;
+    }
+
+    totalWeight += weightKg * qty;
+    totalVolume += volumeCBM * qty;
+
+  });
+
+  // ✈ Air logic
+  const volumetricWeight = totalVolume * 167;
+  const chargeableWeight = Math.max(totalWeight, volumetricWeight);
+
+  // UI update
+  document.getElementById("totals").innerHTML = `
+    <div class="glass p-3 rounded-xl space-y-1">
+
+      <div>Total Weight: <b>${totalWeight.toFixed(2)} kg</b></div>
+      <div>Total Volume: <b>${totalVolume.toFixed(3)} CBM</b></div>
+
+      <div class="text-blue-300">
+        Chargeable Weight: <b>${chargeableWeight.toFixed(2)} kg</b>
+      </div>
+
+    </div>
+  `;
+}
+document.addEventListener("input", (e) => {
+  if (e.target.closest(".cargo-item")) {
+    calculateTotals();
+  }
+});
+  
 </script>
 
 </body>
