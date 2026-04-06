@@ -575,48 +575,42 @@ function attachAutocomplete(inputId, type) {
   const input = document.getElementById(inputId);
 
   const dropdown = document.createElement("div");
-  dropdown.className = "absolute z-50 bg-black border border-white/10 rounded-lg mt-1 w-full text-sm hidden";
+  dropdown.className = "absolute z-[9999] bg-red-500 text-white mt-1 w-full text-sm hidden";
 
   input.parentElement.style.position = "relative";
   input.parentElement.appendChild(dropdown);
 
   input.addEventListener("input", () => {
 
-    console.log("typing:", input.value);
+    console.log("🔥 typing:", input.value);
 
-    const query = input.value.trim();
+    const query = input.value.trim().toLowerCase();
 
-    if (query.length < 2) {
+    if (query.length < 1) {
       dropdown.classList.add("hidden");
       return;
     }
 
-    const results = filterLocations(query);
+    const results = locations.filter(loc => {
+      return (loc.search || "").toLowerCase().includes(query);
+    });
 
-    console.log("results:", results);
+    console.log("🔥 results:", results);
 
     dropdown.innerHTML = "";
 
-    results.forEach(loc => {
+    results.slice(0,5).forEach(loc => {
 
       const option = document.createElement("div");
-      option.className = "p-2 cursor-pointer hover:bg-white/10";
+      option.className = "p-2 cursor-pointer";
 
-      option.innerHTML = `<b>${loc.code}</b> — ${loc.city}, ${loc.country}`;
-
-      option.onclick = () => {
-
-        input.value = `${loc.code} - ${loc.city}, ${loc.country}`;
-
-        dropdown.classList.add("hidden");
-      };
+      option.innerText = `${loc.code} - ${loc.city}`;
 
       dropdown.appendChild(option);
     });
 
-    dropdown.classList.toggle("hidden", results.length === 0);
+    dropdown.classList.remove("hidden");
   });
-
 }
 
 
