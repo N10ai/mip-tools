@@ -449,13 +449,28 @@ form.onsubmit=(e)=>{
 };
 
 // INTRO
-window.onload=()=>{
-  setTimeout(()=>{
-    const intro=document.getElementById("introScreen");
-    intro.style.opacity="0";
-    setTimeout(()=>intro.style.display="none",600);
-  },2200);
-};
+
+//////////////////////////////////////////////////
+// INTRO FIX (DO NOT USE window.onload)
+//////////////////////////////////////////////////
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const intro = document.getElementById("introScreen");
+
+  // fallback safety (force hide no matter what)
+  setTimeout(() => {
+
+    intro.style.opacity = "0";
+
+    setTimeout(() => {
+      intro.style.display = "none";
+    }, 600);
+
+  }, 2000);
+
+});
+
 
 // SERVICE
 const modeEl = document.getElementById("mode");
