@@ -743,15 +743,6 @@ payload.delivery = {
       let H = parseFloat(item.querySelector(".height")?.value) || 0;
       const dimUnit = item.querySelector(".dimUnit")?.value;
 
-if (!payload.email) {
-  alert("Email is required");
-  return;
-}
-
-if (payload.cargo.length === 0) {
-  alert("Please add at least one cargo item");
-  return;
-}
 
       
       // 🔹 FULL CONVERSIONS
@@ -819,6 +810,15 @@ if (payload.cargo.length === 0) {
         }
 
       });
+if (!payload.email) {
+  alert("Email is required");
+  return;
+}
+
+if (payload.cargo.length === 0) {
+  alert("Please add at least one cargo item");
+  return;
+}
 
     });
 
