@@ -611,31 +611,37 @@ const serviceEl = document.getElementById("serviceType");
 const serviceWrap = document.getElementById("serviceWrap");
 const containerWrap = document.getElementById("containerWrap");
 
-const airOceanFields = document.getElementById("airOceanFields");
+
 const groundFields = document.getElementById("groundFields");
 
 function updateShipmentUI() {
 
-  const mode = modeEl.value; // ✅ MOVE THIS FIRST
+  const mode = modeEl.value;
   const routeSection = document.getElementById("routeSection");
 
-  // SHOW ROUTE ONLY IF MODE SELECTED
-  if (mode) {
+  // ROUTE VISIBILITY
+  if (mode === "ground") {
+    routeSection.classList.add("hidden");
+  } else if (mode) {
     routeSection.classList.remove("hidden");
   } else {
     routeSection.classList.add("hidden");
   }
 
+  // RESET UI
   serviceWrap.classList.add("hidden");
   containerWrap.classList.add("hidden");
-  serviceEl.innerHTML = '<option value="">Service Type</option>';
+  groundFields.classList.add("hidden");
 
-  if (mode === "ground") {
-    airOceanFields.classList.add("hidden");
-    groundFields.classList.remove("hidden");
-  } else {
-    airOceanFields.classList.remove("hidden");
-    groundFields.classList.add("hidden");
+  serviceEl.innerHTML = '<option value="">Select service</option>';
+
+  // MODE LOGIC
+  if (mode === "air") {
+    serviceWrap.classList.remove("hidden");
+    serviceEl.innerHTML += `
+      <option value="airport">Airport to Airport</option>
+      <option value="door">Door to Door</option>
+    `;
   }
 
   if (mode === "ocean") {
@@ -647,6 +653,8 @@ function updateShipmentUI() {
   }
 
   if (mode === "ground") {
+    groundFields.classList.remove("hidden");
+
     serviceWrap.classList.remove("hidden");
     serviceEl.innerHTML += `
       <option value="ltl">LTL</option>
