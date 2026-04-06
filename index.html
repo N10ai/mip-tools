@@ -308,10 +308,10 @@ No back-and-forth. No delays.
 
     <select name="containerSize" class="input p-3 rounded-lg w-full">
       <option value="">Container Size</option>
-      <option>20GP</option>
-      <option>40GP</option>
-      <option>40HQ</option>
-      <option>45HQ</option>
+     <option value="40hq">40' High Cube (40HC)</option>
+<option value="40gp">40' Standard (40GP)</option>
+<option value="20gp">20' Standard (20GP)</option>
+<option value="45hq">45' High Cube</option>
     </select>
 
   </div>
@@ -667,6 +667,20 @@ function updateShipmentUI() {
 
 modeEl.addEventListener("change", updateShipmentUI);
 updateShipmentUI();
+
+  serviceEl.addEventListener("change", () => {
+
+  const mode = modeEl.value;
+  const service = serviceEl.value;
+
+  // ONLY SHOW FOR OCEAN + FCL
+  if (mode === "ocean" && service === "fcl") {
+    containerWrap.classList.remove("hidden");
+  } else {
+    containerWrap.classList.add("hidden");
+  }
+
+});
 
 //////////////////////////////////////////////////
 // ✅ AUTOCOMPLETE FIX — REPLACE YOUR OLD BLOCK WITH THIS
