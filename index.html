@@ -363,9 +363,6 @@ Submit Quote
 
 <script>
 
-<!-- ONLY SCRIPT PART CHANGED — EVERYTHING ELSE PRESERVED -->
-
-
 // STEP SYSTEM
 let step = 0;
 const steps = document.querySelectorAll(".step");
@@ -465,29 +462,17 @@ form.onsubmit=(e)=>{
   alert("Ready to connect webhook");
 };
 
-// INTRO
-
-//////////////////////////////////////////////////
-// INTRO FIX (DO NOT USE window.onload)
-//////////////////////////////////////////////////
-
+// INTRO FIX
 document.addEventListener("DOMContentLoaded", () => {
-
   const intro = document.getElementById("introScreen");
 
-  // fallback safety (force hide no matter what)
   setTimeout(() => {
-
     intro.style.opacity = "0";
-
     setTimeout(() => {
       intro.style.display = "none";
     }, 600);
-
   }, 2000);
-
 });
-
 
 // SERVICE
 const modeEl = document.getElementById("mode");
@@ -543,7 +528,7 @@ updateShipmentUI();
 
 
 //////////////////////////////////////////////////
-// AUTOCOMPLETE — FIXED
+// ✅ AUTOCOMPLETE FIX (REAL FIX)
 //////////////////////////////////////////////////
 
 let locations = [];
@@ -570,44 +555,38 @@ function attachAutocomplete(inputId, type) {
   const dropdown = document.createElement("div");
   dropdown.className =
     "absolute left-0 top-full z-[9999] mt-1 w-full bg-slate-900 border border-white/10 rounded-lg shadow-xl text-sm hidden max-h-64 overflow-y-auto";
+
   wrapper.appendChild(dropdown);
 
   input.addEventListener("input", () => {
+
     const query = input.value.trim().toLowerCase();
 
-    if (query.length < 2) {
+    if (query.length < 1) {
       dropdown.classList.add("hidden");
-      dropdown.innerHTML = "";
       return;
     }
 
-    const results = locations
-      .filter(loc => {
-        const text = (
-          loc.search ||
-          `${loc.code} ${loc.name} ${loc.city} ${loc.country}`
-        ).toLowerCase();
-
-        return text.includes(query);
-      })
-      .slice(0, 8);
+    const results = locations.filter(loc => {
+      return (
+        (loc.code && loc.code.toLowerCase().includes(query)) ||
+        (loc.city && loc.city.toLowerCase().includes(query)) ||
+        (loc.name && loc.name.toLowerCase().includes(query)) ||
+        (loc.country && loc.country.toLowerCase().includes(query))
+      );
+    }).slice(0, 8);
 
     dropdown.innerHTML = "";
 
-    if (results.length === 0) {
-      dropdown.innerHTML = `<div class="p-2 text-gray-400">No results</div>`;
-      dropdown.classList.remove("hidden");
-      return;
-    }
-
     results.forEach(loc => {
-      const option = document.createElement("button");
-      option.type = "button";
-      option.className = "block w-full text-left p-2 hover:bg-white/10";
+
+      const option = document.createElement("div");
+      option.className = "p-2 cursor-pointer hover:bg-white/10";
 
       option.innerHTML = `<b>${loc.code}</b> — ${loc.city}, ${loc.country}`;
 
-      option.addEventListener("click", () => {
+      option.onclick = () => {
+
         input.value = `${loc.code} - ${loc.city}, ${loc.country}`;
 
         if (type === "origin") {
@@ -621,18 +600,12 @@ function attachAutocomplete(inputId, type) {
         }
 
         dropdown.classList.add("hidden");
-      });
+      };
 
       dropdown.appendChild(option);
     });
 
     dropdown.classList.remove("hidden");
-  });
-
-  input.addEventListener("focus", () => {
-    if (dropdown.innerHTML.trim() !== "") {
-      dropdown.classList.remove("hidden");
-    }
   });
 
   document.addEventListener("click", (e) => {
@@ -641,7 +614,6 @@ function attachAutocomplete(inputId, type) {
     }
   });
 }
-
 
 </script>
 
