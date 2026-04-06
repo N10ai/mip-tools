@@ -541,8 +541,9 @@ modeEl.addEventListener("change", updateShipmentUI);
 updateShipmentUI();
 
 
+
 //////////////////////////////////////////////////
-// ✅ AUTOCOMPLETE FIX (REAL FIX)
+// ✅ AUTOCOMPLETE FIX — REPLACE YOUR OLD BLOCK WITH THIS
 //////////////////////////////////////////////////
 
 let locations = [];
@@ -550,6 +551,8 @@ let locations = [];
 async function loadLocations() {
   try {
     const res = await fetch("/mip-tools/logistics-locations.json");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
     locations = await res.json();
 
     document.getElementById("debugBox").innerText =
@@ -559,8 +562,9 @@ async function loadLocations() {
     attachAutocomplete("destinationSearch", "destination");
 
   } catch (err) {
+    console.error("JSON load error:", err);
     document.getElementById("debugBox").innerText =
-      "ERROR loading JSON";
+      "ERROR loading JSON: " + err.message;
   }
 }
 
@@ -569,8 +573,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function attachAutocomplete(inputId, type) {
-
   const input = document.getElementById(inputId);
+  if (!input) return;
 
   const dropdown = document.createElement("div");
   dropdown.style.position = "fixed";
@@ -580,56 +584,107 @@ function attachAutocomplete(inputId, type) {
   dropdown.style.border = "1px solid #444";
   dropdown.style.borderRadius = "8px";
   dropdown.style.display = "none";
-  dropdown.style.maxHeight = "200px";
+  dropdown.style.maxHeight = "220px";
   dropdown.style.overflowY = "auto";
+  dropdown.style.boxShadow = "0 10px 30px rgba(0,0,0,0.35)";
 
   document.body.appendChild(dropdown);
 
-  input.addEventListener("input", () => {
-
-    const query = input.value.toLowerCase();
-
+  function positionDropdown() {
     const rect = input.getBoundingClientRect();
-
     dropdown.style.top = rect.bottom + "px";
     dropdown.style.left = rect.left + "px";
     dropdown.style.width = rect.width + "px";
+  }
 
-    let results = locations.filter(loc => {
-      return (
-        (loc.code || "").toLowerCase().includes(query) ||
-        (loc.city || "").toLowerCase().includes(query) ||
-        (loc.name || "").toLowerCase().includes(query) ||
-        (loc.country || "").toLowerCase().includes(query)
-      );
-    });
+  function closeDropdown() {
+    dropdown.style.display = "none";
+  }
 
-    // 🔥 fallback (critical for debugging)
-    if (results.length === 0) {
-      results = locations.slice(0,5);
-    }
+  input.addEventListener("input", () => {
+    const query = input.value.trim().toLowerCase();
 
+    positionDropdown();
     dropdown.innerHTML = "";
 
-    results.slice(0,5).forEach(loc => {
+    if (!query) {
+      closeDropdown();
+      return;
+    }
 
+    let results = locations.filter(loc =>
+      (loc.search || "").toLowerCase().includes(query)
+    );
+
+    results = results.slice(0, 8);
+
+    if (results.length === 0) {
+      const empty = document.createElement("div");
+      empty.style.padding = "10px";
+      empty.style.opacity = "0.7";
+      empty.innerText = "No matches found";
+      dropdown.appendChild(empty);
+      dropdown.style.display = "block";
+      return;
+    }
+
+    results.forEach(loc => {
       const item = document.createElement("div");
-      item.style.padding = "8px";
+      item.style.padding = "10px";
       item.style.cursor = "pointer";
+      item.style.borderBottom = "1px solid rgba(255,255,255,0.06)";
+      item.innerText = `${loc.code} - ${loc.city}, ${loc.country}`;
 
-      item.innerText = `${loc.code} - ${loc.city}`;
+      item.addEventListener("mouseenter", () => {
+        item.style.background = "rgba(59,130,246,0.18)";
+      });
 
-      item.onmousedown = () => {
-        input.value = `${loc.code} - ${loc.city}`;
+      item.addEventListener("mouseleave", () => {
+        item.style.background = "transparent";
+      });
+
+      item.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+
+        input.value = `${loc.code} - ${loc.city}, ${loc.country}`;
+
+        if (type === "origin") {
+          document.getElementById("originCode").value = loc.code || "";
+          document.getElementById("originName").value = loc.name || "";
+          document.getElementById("originCountry").value = loc.country || "";
+        } else {
+          document.getElementById("destinationCode").value = loc.code || "";
+          document.getElementById("destinationName").value = loc.name || "";
+          document.getElementById("destinationCountry").value = loc.country || "";
+        }
+
         dropdown.style.display = "none";
-      };
+
+        form.dispatchEvent(new Event("input", { bubbles: true }));
+      });
 
       dropdown.appendChild(item);
     });
 
     dropdown.style.display = "block";
   });
+
+  input.addEventListener("focus", () => {
+    if (input.value.trim()) {
+      input.dispatchEvent(new Event("input"));
+    }
+  });
+
+  input.addEventListener("blur", () => {
+    setTimeout(() => {
+      closeDropdown();
+    }, 150);
+  });
+
+  window.addEventListener("resize", positionDropdown);
+  window.addEventListener("scroll", positionDropdown, true);
 }
+
 
 </script>
 
