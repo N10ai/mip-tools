@@ -116,6 +116,17 @@ body {
 @keyframes textIn {
   to { opacity:1; transform:translateY(0);}
 }
+select {
+  background-color: rgba(255,255,255,0.05);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+select option {
+  background-color: #020617;
+  color: white;
+}
+  
 </style>
 </head>
 
@@ -191,7 +202,31 @@ No back-and-forth. No delays.
 
 <!-- STEP 0: CONTACT -->
 <div class="step active">
-  <div class="grid grid-cols-1 gap-4">
+  <div class="grid grid-cols-1 gap-4"><div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+  <div>
+    <label class="text-xs text-gray-400 mb-1 block">From</label>
+    <input
+      id="originSearch"
+      name="originSearch"
+      class="input p-3 rounded-lg w-full"
+      autocomplete="off"
+      placeholder="Origin Airport / Port / City"
+    >
+  </div>
+
+  <div>
+    <label class="text-xs text-gray-400 mb-1 block">To</label>
+    <input
+      id="destinationSearch"
+      name="destinationSearch"
+      class="input p-3 rounded-lg w-full"
+      autocomplete="off"
+      placeholder="Destination Airport / Port / City"
+    >
+  </div>
+
+</div>
     <input
       name="referenceNumber"
       class="input p-3 rounded-lg"
@@ -214,7 +249,9 @@ No back-and-forth. No delays.
 
 <!-- STEP 1: SHIPMENT -->
 <div class="step">
-
+<div class="text-xs text-gray-400 mb-2">
+Route
+</div>
 <!-- MODE -->
 <select id="mode" name="mode" class="input p-3 rounded-lg w-full mb-4">
   <option value="">Transport Mode</option>
@@ -316,7 +353,9 @@ No back-and-forth. No delays.
 
 <!-- STEP 2 -->
 <div class="step">
-
+<div class="text-xs text-gray-400 mb-2">
+Cargo Details
+</div>
 <div id="cargoItems"></div>
 
 <button type="button" id="addCargo" class="mt-4 bg-blue-600 px-4 py-2 rounded">
@@ -337,9 +376,34 @@ No back-and-forth. No delays.
 
 <label><input type="checkbox" id="includeInland"> Include Inland</label>
 
-<div id="inlandFields" class="hidden mt-4">
-<input id="pickupCompany" class="input p-3 rounded mb-2" placeholder="Pickup Company">
-<input id="deliveryCompany" class="input p-3 rounded" placeholder="Delivery Company">
+<div id="inlandFields" class="hidden mt-4 space-y-4">
+
+  <div class="glass p-4 rounded-xl">
+    <div class="text-sm text-blue-300 mb-2">Pickup</div>
+
+    <input class="input p-2 mb-2 w-full" placeholder="Company Name">
+    <input class="input p-2 mb-2 w-full" placeholder="Contact Name">
+    <input class="input p-2 mb-2 w-full" placeholder="Phone">
+    <input class="input p-2 mb-2 w-full" placeholder="Email">
+    <input class="input p-2 mb-2 w-full" placeholder="Address">
+    <input class="input p-2 mb-2 w-full" placeholder="City">
+    <input class="input p-2 mb-2 w-full" placeholder="Country">
+    <input class="input p-2 w-full" placeholder="Hours (e.g. 8am - 5pm)">
+  </div>
+
+  <div class="glass p-4 rounded-xl">
+    <div class="text-sm text-blue-300 mb-2">Delivery</div>
+
+    <input class="input p-2 mb-2 w-full" placeholder="Company Name">
+    <input class="input p-2 mb-2 w-full" placeholder="Contact Name">
+    <input class="input p-2 mb-2 w-full" placeholder="Phone">
+    <input class="input p-2 mb-2 w-full" placeholder="Email">
+    <input class="input p-2 mb-2 w-full" placeholder="Address">
+    <input class="input p-2 mb-2 w-full" placeholder="City">
+    <input class="input p-2 mb-2 w-full" placeholder="Country">
+    <input class="input p-2 w-full" placeholder="Hours">
+  </div>
+
 </div>
 
 <div class="flex justify-between mt-6">
@@ -409,19 +473,41 @@ document.querySelectorAll(".tab").forEach(tab=>{
 
 // CARGO
 document.getElementById("addCargo").onclick = ()=>{
-  const div = document.createElement("div");
-  div.className="mb-4";
+const index = document.querySelectorAll("#cargoItems > div").length + 1;
 
-  div.innerHTML=`
-  <input class="input p-2 mb-1 qty rounded" placeholder="Qty">
-  <input class="input p-2 mb-1 weight rounded" placeholder="Weight">
-  <input class="input p-2 mb-1 length rounded" placeholder="Length">
-  <input class="input p-2 mb-1 width rounded" placeholder="Width">
-  <input class="input p-2 mb-1 height rounded" placeholder="Height">
-  `;
+div.innerHTML = `
+<div class="glass p-4 rounded-xl">
 
-  document.getElementById("cargoItems").appendChild(div);
-};
+  <div class="text-sm mb-2 text-blue-300 font-semibold">
+    Item #${index}
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-6 gap-2">
+
+    <input class="input p-2 rounded qty" placeholder="Qty">
+
+    <input class="input p-2 rounded weight" placeholder="Weight">
+
+    <select class="input p-2 rounded weightUnit">
+      <option value="kg">kg</option>
+      <option value="lb">lb</option>
+    </select>
+
+    <input class="input p-2 rounded length" placeholder="L">
+
+    <input class="input p-2 rounded width" placeholder="W">
+
+    <input class="input p-2 rounded height" placeholder="H">
+
+    <select class="input p-2 rounded dimUnit col-span-2 md:col-span-1">
+      <option value="cm">cm</option>
+      <option value="in">in</option>
+    </select>
+
+  </div>
+
+</div>
+`;
 
 // SUMMARY
 const form=document.getElementById("quoteForm");
