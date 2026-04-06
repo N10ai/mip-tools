@@ -474,6 +474,45 @@ Submit Quote
   </div>
 </div>
 
+
+  runAiParse.onclick = async () => {
+
+  const text = aiInput.value.trim();
+
+  if (!text) {
+    aiStatus.innerText = "Please paste shipment details first.";
+    return;
+  }
+
+  aiStatus.innerText = "Parsing...";
+
+  try {
+
+    const res = await fetch("https://n8n-n10ai.onrender.com/webhook/ai parser 2", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        text: text
+      })
+    });
+
+    const data = await res.json();
+
+    console.log("AI RESPONSE:", data);
+
+    fillFormFromAI(data);
+
+    aiStatus.innerText = "✅ Parsed successfully";
+    closeAiParserModal();
+
+  } catch (err) {
+    console.error(err);
+    aiStatus.innerText = "❌ Error parsing shipment";
+  }
+
+};
   
 </form>
 
@@ -1008,6 +1047,104 @@ function addCargoItemFromData(itemData = {}) {
 
   div.innerHTML = `
   <div class="glass p-4 rounded-xl mb-3 relative cargo
+
+
+function fillFormFromAI(data) {
+
+  // 🔹 MODE
+  if (data.mode) {
+    document.getElementById("mode").value = data.mode;
+    updateShipmentUI();
+  }
+
+  // 🔹 ORIGIN / DESTINATION
+  if (data.origin) {
+    document.getElementById("originSearch").value = data.origin;
+  }
+
+  if (data.destination) {
+    document.getElementById("destinationSearch").value = data.destination;
+  }
+
+  // 🔹 CARGO
+  if (data.cargo && Array.isArray(data.cargo)) {
+
+    clearCargoItems();
+
+    data.cargo.forEach(item => {
+      addCargoItemFromData(item);
+    });
+
+    updateCargoNumbers();
+    calculateTotals();
+  }
+
+}
+
+function addCargoItemFromData(itemData = {}) {
+
+  const div = document.createElement("div");
+  const index = document.querySelectorAll(".cargo-item").length + 1;
+
+  div.innerHTML = `
+  <div class="glass p-4 rounded-xl mb-3 relative cargo-item">
+
+    <button type="button"
+      class="absolute top-2 right-2 text-xs bg-red-500/20 hover:bg-red-500/40 px-2 py-1 rounded text-red-300"
+      onclick="this.closest('.cargo-item').remove(); updateCargoNumbers(); calculateTotals();">
+      ✕
+    </button>
+
+    <div class="text-sm mb-2 text-blue-300 font-semibold cargo-title">
+      Item #${index}
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3">
+
+      <select class="input p-2 rounded cargoType">
+        <option value="">Cargo Type</option>
+        <option value="general">General Cargo</option>
+        <option value="dg">Dangerous Goods</option>
+      </select>
+
+      <select class="input p-2 rounded packagingType">
+        <option value="">Packaging</option>
+        <option value="pallet">Pallet</option>
+        <option value="box">Box</option>
+        <option value="crate">Crate</option>
+      </select>
+
+      <input class="input p-2 rounded commodity" placeholder="Commodity">
+
+    </div>
+
+    <div class="grid grid-cols-4 gap-2">
+
+      <input class="input p-2 rounded qty" placeholder="Qty" value="${itemData.qty || ""}">
+
+      <input class="input p-2 rounded weight" placeholder="Weight" value="${itemData.weight || ""}">
+
+      <select class="input p-2 rounded weightUnit">
+        <option value="kg" ${itemData.weightUnit === "kg" ? "selected" : ""}>kg</option>
+        <option value="lb" ${itemData.weightUnit === "lb" ? "selected" : ""}>lb</option>
+      </select>
+
+      <input class="input p-2 rounded length" placeholder="L" value="${itemData.length || ""}">
+      <input class="input p-2 rounded width" placeholder="W" value="${itemData.width || ""}">
+      <input class="input p-2 rounded height" placeholder="H" value="${itemData.height || ""}">
+
+      <select class="input p-2 rounded dimUnit">
+        <option value="cm" ${itemData.dimUnit === "cm" ? "selected" : ""}>cm</option>
+        <option value="in" ${itemData.dimUnit === "in" ? "selected" : ""}>in</option>
+      </select>
+
+    </div>
+
+  </div>
+  `;
+
+  document.getElementById("cargoItems").appendChild(div);
+}
 
   
 </script>
