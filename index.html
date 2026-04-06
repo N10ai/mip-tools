@@ -227,50 +227,57 @@ No back-and-forth. No delays.
 
 </div>
 <!-- STEP 1: SHIPMENT -->
+<!-- STEP 1: SHIPMENT -->
 <div class="step">
 
+  <!-- MODE -->
   <div class="text-xs text-gray-400 mb-2">
-    Route
+    Transport Mode
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+  <select id="mode" name="mode" class="input p-3 rounded-lg w-full mb-4">
+    <option value="" disabled selected>Select transport mode</option>
+    <option value="air">✈ Air</option>
+    <option value="ocean">🚢 Ocean</option>
+    <option value="ground">🚚 Ground</option>
+  </select>
 
-    <div>
-      <label class="text-xs text-gray-400 mb-1 block">From</label>
-      <input
-        id="originSearch"
-        name="originSearch"
-        class="input p-3 rounded-lg w-full"
-        autocomplete="off"
-        placeholder="Origin Airport / Port / City"
-      >
+  <!-- ROUTE -->
+  <div id="routeSection" class="hidden">
+
+    <div class="text-xs text-gray-400 mb-2">
+      Route
     </div>
 
-    <div>
-      <label class="text-xs text-gray-400 mb-1 block">To</label>
-      <input
-        id="destinationSearch"
-        name="destinationSearch"
-        class="input p-3 rounded-lg w-full"
-        autocomplete="off"
-        placeholder="Destination Airport / Port / City"
-      >
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+
+      <div>
+        <label class="text-xs text-gray-400 mb-1 block">From</label>
+        <input
+          id="originSearch"
+          name="originSearch"
+          class="input p-3 rounded-lg w-full"
+          autocomplete="off"
+          placeholder="Origin Airport / Port / City"
+        >
+      </div>
+
+      <div>
+        <label class="text-xs text-gray-400 mb-1 block">To</label>
+        <input
+          id="destinationSearch"
+          name="destinationSearch"
+          class="input p-3 rounded-lg w-full"
+          autocomplete="off"
+          placeholder="Destination Airport / Port / City"
+        >
+      </div>
+
     </div>
 
   </div>
-<!-- MODE -->
-<select id="mode" name="mode" class="input p-3 rounded-lg w-full mb-4">
-  <option value="">Transport Mode</option>
-  <option value="air">✈ Air</option>
-  <option value="ocean">🚢 Ocean</option>
-  <option value="ground">🚚 Ground</option>
-</select>
 
-<!-- AIR / OCEAN ROUTE -->
-<div id="airOceanFields">
-
-
-  <!-- hidden structured fields for later autocomplete/JSON hookup -->
+  <!-- hidden structured fields -->
   <input type="hidden" id="originCode" name="originCode">
   <input type="hidden" id="originName" name="originName">
   <input type="hidden" id="originCountry" name="originCountry">
@@ -279,58 +286,69 @@ No back-and-forth. No delays.
   <input type="hidden" id="destinationName" name="destinationName">
   <input type="hidden" id="destinationCountry" name="destinationCountry">
 
-</div>
+  <!-- SERVICE -->
+  <div id="serviceWrap" class="hidden mt-4">
 
-<!-- GROUND ROUTE -->
-<div id="groundFields" class="hidden">
+    <div class="text-xs text-gray-400 mb-2">
+      Service Type
+    </div>
 
-  <div class="grid grid-cols-2 gap-4">
-
-    <input name="originCity" class="input p-3 rounded-lg" placeholder="Origin City">
-    <input name="destinationCity" class="input p-3 rounded-lg" placeholder="Destination City">
-
-    <input name="originState" class="input p-3 rounded-lg" placeholder="Origin State">
-    <input name="destinationState" class="input p-3 rounded-lg" placeholder="Destination State">
-
-    <input name="originCountryGround" class="input p-3 rounded-lg" placeholder="Origin Country">
-    <input name="destinationCountryGround" class="input p-3 rounded-lg" placeholder="Destination Country">
+    <select id="serviceType" name="serviceType" class="input p-3 rounded-lg w-full">
+      <option value="">Select service</option>
+    </select>
 
   </div>
 
-</div>
+  <!-- CONTAINER -->
+  <div id="containerWrap" class="hidden mt-4">
 
-<!-- SERVICE -->
-<div id="serviceWrap" class="mt-5 hidden">
+    <div class="text-xs text-gray-400 mb-2">
+      Container
+    </div>
 
-  <select id="serviceType" name="serviceType" class="input p-3 rounded-lg w-full">
-    <option value="">Service Type</option>
-  </select>
+    <select name="containerSize" class="input p-3 rounded-lg w-full">
+      <option value="">Container Size</option>
+      <option>20GP</option>
+      <option>40GP</option>
+      <option>40HQ</option>
+      <option>45HQ</option>
+    </select>
 
-</div>
+  </div>
 
-<!-- CONTAINER (ONLY FCL) -->
-<div id="containerWrap" class="mt-4 hidden">
+  <!-- GROUND FIELDS -->
+  <div id="groundFields" class="hidden mt-4">
 
-  <select name="containerSize" class="input p-3 rounded-lg w-full">
-    <option value="">Container Size</option>
-    <option>20GP</option>
-    <option>40GP</option>
-    <option>40HQ</option>
-    <option>45HQ</option>
-  </select>
+    <div class="text-xs text-gray-400 mb-2">
+      Ground Details
+    </div>
 
-</div>
+    <div class="grid grid-cols-2 gap-4">
 
-<!-- BONDED / FTZ -->
-<div class="mt-5 flex gap-4 text-sm">
-  <label><input type="checkbox" id="isBonded"> Bonded</label>
-  <label><input type="checkbox" id="isFTZ"> FTZ</label>
-</div>
+      <input name="originCity" class="input p-3 rounded-lg" placeholder="Origin City">
+      <input name="destinationCity" class="input p-3 rounded-lg" placeholder="Destination City">
 
-<div class="flex justify-between mt-6">
-  <button type="button" class="prev bg-white/10 px-4 py-2 rounded">Back</button>
-  <button type="button" class="next bg-blue-600 px-4 py-2 rounded">Next</button>
-</div>
+      <input name="originState" class="input p-3 rounded-lg" placeholder="Origin State">
+      <input name="destinationState" class="input p-3 rounded-lg" placeholder="Destination State">
+
+      <input name="originZip" class="input p-3 rounded-lg" placeholder="Origin ZIP">
+      <input name="destinationZip" class="input p-3 rounded-lg" placeholder="Destination ZIP">
+
+    </div>
+
+  </div>
+
+  <!-- BONDED / FTZ -->
+  <div class="mt-5 flex gap-4 text-sm">
+    <label><input type="checkbox" id="isBonded"> Bonded</label>
+    <label><input type="checkbox" id="isFTZ"> FTZ</label>
+  </div>
+
+  <!-- NAV -->
+  <div class="flex justify-between mt-6">
+    <button type="button" class="prev bg-white/10 px-4 py-2 rounded">Back</button>
+    <button type="button" class="next bg-blue-600 px-4 py-2 rounded">Next</button>
+  </div>
 
 </div>
 
@@ -574,7 +592,13 @@ const airOceanFields = document.getElementById("airOceanFields");
 const groundFields = document.getElementById("groundFields");
 
 function updateShipmentUI() {
+const routeSection = document.getElementById("routeSection");
 
+if (mode) {
+  routeSection.classList.remove("hidden");
+} else {
+  routeSection.classList.add("hidden");
+}
   const mode = modeEl.value;
 
   serviceWrap.classList.add("hidden");
