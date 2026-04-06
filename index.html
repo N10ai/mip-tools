@@ -556,49 +556,75 @@ async function loadLocations() {
   }
 }
 
-loadLocations();
+document.addEventListener("DOMContentLoaded", () => {
+  loadLocations();
+});
 
 function attachAutocomplete(inputId, type) {
+
   const input = document.getElementById(inputId);
-  const wrapper = input.parentElement;
 
+  // 🔥 create dropdown OUTSIDE stacking issues
   const dropdown = document.createElement("div");
-  dropdown.className =
-    "absolute left-0 top-full mt-1 w-full bg-slate-900 border border-white/10 rounded-lg shadow-xl text-sm hidden max-h-64 overflow-y-auto";
 
-  wrapper.appendChild(dropdown);
+  dropdown.style.position = "fixed";
+  dropdown.style.zIndex = "99999";
+  dropdown.style.background = "#020617";
+  dropdown.style.border = "1px solid rgba(255,255,255,0.1)";
+  dropdown.style.borderRadius = "8px";
+  dropdown.style.fontSize = "14px";
+  dropdown.style.display = "none";
+  dropdown.style.maxHeight = "250px";
+  dropdown.style.overflowY = "auto";
+  dropdown.style.width = input.offsetWidth + "px";
+
+  document.body.appendChild(dropdown);
 
   input.addEventListener("input", () => {
 
-    const query = input.value.trim().toLowerCase();
+    const query = input.value.toLowerCase().trim();
 
     if (!query) {
-      dropdown.classList.add("hidden");
+      dropdown.style.display = "none";
       return;
     }
 
+    const rect = input.getBoundingClientRect();
+
+    dropdown.style.top = rect.bottom + "px";
+    dropdown.style.left = rect.left + "px";
+    dropdown.style.width = rect.width + "px";
+
     const results = locations.filter(loc => {
+
       const text = `${loc.code} ${loc.name} ${loc.city} ${loc.country}`.toLowerCase();
+
       return text.includes(query);
-    }).slice(0, 8);
+
+    }).slice(0, 6);
 
     dropdown.innerHTML = "";
 
     if (results.length === 0) {
-      dropdown.innerHTML = `<div class="p-2 text-gray-400">No results</div>`;
-      dropdown.classList.remove("hidden");
+      dropdown.innerHTML = `<div style="padding:8px;color:#aaa;">No results</div>`;
+      dropdown.style.display = "block";
       return;
     }
 
     results.forEach(loc => {
 
       const option = document.createElement("div");
-      option.className = "p-2 cursor-pointer hover:bg-white/10";
+
+      option.style.padding = "8px";
+      option.style.cursor = "pointer";
 
       option.innerHTML = `<b>${loc.code}</b> — ${loc.city}, ${loc.country}`;
 
-      option.addEventListener("mousedown", (e) => {
-        e.preventDefault(); // 🔥 IMPORTANT FIX
+      option.onmouseenter = () => option.style.background = "rgba(255,255,255,0.1)";
+      option.onmouseleave = () => option.style.background = "transparent";
+
+      option.onmousedown = (e) => {
+        e.preventDefault();
 
         input.value = `${loc.code} - ${loc.city}, ${loc.country}`;
 
@@ -612,18 +638,18 @@ function attachAutocomplete(inputId, type) {
           destinationCountry.value = loc.country || "";
         }
 
-        dropdown.classList.add("hidden");
-      });
+        dropdown.style.display = "none";
+      };
 
       dropdown.appendChild(option);
     });
 
-    dropdown.classList.remove("hidden");
+    dropdown.style.display = "block";
   });
 
   document.addEventListener("click", (e) => {
-    if (!wrapper.contains(e.target)) {
-      dropdown.classList.add("hidden");
+    if (e.target !== input) {
+      dropdown.style.display = "none";
     }
   });
 }
