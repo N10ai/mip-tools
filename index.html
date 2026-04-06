@@ -473,6 +473,9 @@ Submit Quote
     <div id="aiStatus" class="text-sm text-gray-300 mt-3"></div>
   </div>
 </div>
+
+<input type="hidden" id="quoteNumber" name="quoteNumber">
+
   
 </form>
 
@@ -672,9 +675,18 @@ document.getElementById("includeInland").onchange=e=>{
 };
 
 // SUBMIT
-form.onsubmit=(e)=>{
+form.onsubmit = (e) => {
   e.preventDefault();
-  alert("Ready to connect webhook");
+
+  const quoteNumber = generateQuoteNumber();
+
+  document.getElementById("quoteNumber").value = quoteNumber;
+
+  console.log("QUOTE NUMBER:", quoteNumber);
+
+  // 👉 here you will send webhook later
+
+  alert("Quote Generated: " + quoteNumber);
 };
 
 // INTRO FIX
@@ -1140,6 +1152,25 @@ function addCargoItemFromData(itemData = {}) {
   }
 
 };
+
+//GENERATE QUOTE # 
+function generateQuoteNumber() {
+  const now = new Date();
+
+  const datePart =
+    now.getFullYear().toString() +
+    String(now.getMonth() + 1).padStart(2, "0") +
+    String(now.getDate()).padStart(2, "0");
+
+  const timePart =
+    String(now.getHours()).padStart(2, "0") +
+    String(now.getMinutes()).padStart(2, "0") +
+    String(now.getSeconds()).padStart(2, "0");
+
+  const randomPart = Math.floor(1000 + Math.random() * 9000);
+
+  return `MIP-${datePart}-${timePart}-${randomPart}`;
+}
   
 </script>
 
