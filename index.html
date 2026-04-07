@@ -479,17 +479,10 @@ Submit Quote
   
 </form>
 
-<!-- ONLY SHOWING FIXED SCRIPT PART — YOUR HTML ABOVE STAYS EXACTLY THE SAME -->
 
 <script>
 
-// ✅ DEBUG (NEW - SAFE)
-window.onerror = function (msg, url, line) {
-  document.getElementById("debugBox").innerText =
-    "JS ERROR: " + msg + " @ line " + line;
-};
-
-// STEP SYSTEM (UNCHANGED)
+// STEP SYSTEM
 let step = 0;
 const steps = document.querySelectorAll(".step");
 
@@ -519,20 +512,180 @@ document.querySelectorAll(".tab").forEach(tab=>{
   tab.onclick = ()=>showStep(Number(tab.dataset.step));
 });
 
-// ==========================
-// 🔧 FIXED SUBMIT FUNCTION
-// ==========================
-const form = document.getElementById("quoteForm");
+// CARGO
+document.getElementById("addCargo").onclick = () => {
 
+  const div = document.createElement("div");
+
+ const index = document.querySelectorAll(".cargo-item").length + 1;
+
+div.innerHTML = `
+<div class="glass p-4 rounded-xl mb-3 relative cargo-item">
+
+  <!-- DELETE BUTTON -->
+  <button type="button"
+    class="absolute top-2 right-2 text-xs bg-red-500/20 hover:bg-red-500/40 px-2 py-1 rounded text-red-300"
+  onclick="this.closest('.cargo-item').remove(); updateCargoNumbers(); calculateTotals();">
+    ✕
+  </button>
+
+  <!-- TITLE -->
+  <div class="text-sm mb-2 text-blue-300 font-semibold cargo-title">
+    Item #${index}
+  </div>
+<div class="text-xs text-gray-400 mb-1">
+  Classification
+</div>
+  <!-- NEW FIELDS -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3">
+
+    <!-- Cargo Type -->
+    <select class="input p-2 rounded cargoType">
+      <option value="">Cargo Type</option>
+      <option value="general">General Cargo</option>
+      <option value="dg">Dangerous Goods</option>
+      <option value="hazmat">Hazmat</option>
+      <option value="oversized">Oversized</option>
+      <option value="overweight">Overweight</option>
+    </select>
+
+    <!-- Packaging -->
+    <select class="input p-2 rounded packagingType">
+      <option value="">Packaging</option>
+      <option value="pallet">Pallet</option>
+      <option value="box">Box</option>
+      <option value="skid">Skid</option>
+      <option value="crate">Crate</option>
+      <option value="drum">Drum</option>
+      <option value="bag">Bag</option>
+    </select>
+
+    <!-- Commodity -->
+    <input class="input p-2 rounded commodity" placeholder="Commodity (e.g. Apparel, Electronics)">
+
+  </div>
+
+  <!-- EXISTING FIELDS -->
+  <div class="text-xs text-gray-400 mt-3 mb-1">
+  Dimensions & Weight
+</div>
+<!-- WEIGHT -->
+<div class="grid grid-cols-4 gap-2 mb-2">
+
+  <input class="input p-2 rounded qty col-span-1" placeholder="Qty">
+
+  <input class="input p-2 rounded weight col-span-2" placeholder="Weight">
+
+  <select class="input p-2 rounded weightUnit col-span-1">
+    <option value="kg">kg</option>
+    <option value="lb">lb</option>
+  </select>
+
+</div>
+
+<!-- DIMENSIONS -->
+<div class="grid grid-cols-4 gap-2">
+
+  <input class="input p-2 rounded length col-span-1" placeholder="L">
+
+  <input class="input p-2 rounded width col-span-1" placeholder="W">
+
+  <input class="input p-2 rounded height col-span-1" placeholder="H">
+
+  <select class="input p-2 rounded dimUnit col-span-1">
+    <option value="cm">cm</option>
+    <option value="in">in</option>
+  </select>
+
+</div>
+`;
+
+  // IMPORTANT: add class for deletion targeting
+
+
+  document.getElementById("cargoItems").appendChild(div);
+};
+calculateTotals();
+  
+function updateCargoNumbers() {
+  const items = document.querySelectorAll(".cargo-item");
+
+  items.forEach((item, index) => {
+    const title = item.querySelector(".cargo-title");
+    if (title) {
+      title.innerText = `Item #${index + 1}`;
+    }
+  });
+}
+
+
+  
+// SUMMARY
+const form=document.getElementById("quoteForm");
+
+form.addEventListener("input",()=>{
+  const data=new FormData(form);
+
+  const mode = data.get("mode") || "-";
+  const origin = mode === "ground"
+    ? (data.get("originCity") || "-")
+    : (data.get("originSearch") || "-");
+
+  const destination = mode === "ground"
+    ? (data.get("destinationCity") || "-")
+    : (data.get("destinationSearch") || "-");
+
+  const reference = data.get("referenceNumber") || "-";
+  const email = data.get("email") || "-";
+
+  document.getElementById("summary").innerHTML=`
+  <p>Reference: ${reference}</p>
+  <p>Email: ${email}</p>
+  <p>Origin: ${origin}</p>
+  <p>Destination: ${destination}</p>
+  <p>Mode: ${mode}</p>
+  `;
+});
+
+// AI
+const aiModal = document.getElementById("aiModal");
+const aiFillBtn = document.getElementById("aiFill");
+const closeAiModal = document.getElementById("closeAiModal");
+const cancelAiModal = document.getElementById("cancelAiModal");
+const runAiParse = document.getElementById("runAiParse");
+const aiInput = document.getElementById("aiInput");
+const aiStatus = document.getElementById("aiStatus");
+
+aiFillBtn.onclick = () => {
+  aiModal.classList.remove("hidden");
+  aiModal.classList.add("flex");
+  aiInput.focus();
+};
+
+function closeAiParserModal() {
+  aiModal.classList.add("hidden");
+  aiModal.classList.remove("flex");
+  aiStatus.innerText = "";
+}
+
+closeAiModal.onclick = closeAiParserModal;
+cancelAiModal.onclick = closeAiParserModal;
+// INLAND
+document.getElementById("includeInland").onchange=e=>{
+  document.getElementById("inlandFields").classList.toggle("hidden", !e.target.checked);
+};
+
+// SUBMIT
 form.onsubmit = async (e) => {
   e.preventDefault();
 
   try {
 
-    // 🔹 Quote Number
+    // 🔹 1. Generate Quote Number
     const quoteNumber = generateQuoteNumber();
     document.getElementById("quoteNumber").value = quoteNumber;
 
+    // 🔹 2. Base form data
     const data = new FormData(form);
     const payload = {};
 
@@ -540,45 +693,46 @@ form.onsubmit = async (e) => {
       payload[key] = value;
     });
 
-    // 🔹 Flags
+    // 🔹 3. Booleans
     payload.isFTZ = document.getElementById("isFTZ").checked;
     payload.isBonded = document.getElementById("isBonded").checked;
     payload.includeInland = document.getElementById("includeInland").checked;
 
-    // 🔹 PICKUP
+    // 🔹 4. PICKUP
     const pickupSection = document.querySelector("#inlandFields > div:first-child");
 
     payload.pickup = {
-      company: pickupSection?.querySelectorAll("input")[0]?.value || "",
-      contact: pickupSection?.querySelectorAll("input")[1]?.value || "",
-      phone: pickupSection?.querySelectorAll("input")[2]?.value || "",
-      email: pickupSection?.querySelectorAll("input")[3]?.value || "",
-      address: pickupSection?.querySelectorAll("input")[4]?.value || "",
-      city: pickupSection?.querySelectorAll("input")[5]?.value || "",
-      country: pickupSection?.querySelectorAll("input")[6]?.value || "",
-      hours: pickupSection?.querySelectorAll("input")[7]?.value || ""
+      company: pickupSection.querySelectorAll("input")[0]?.value || "",
+      contact: pickupSection.querySelectorAll("input")[1]?.value || "",
+      phone: pickupSection.querySelectorAll("input")[2]?.value || "",
+      email: pickupSection.querySelectorAll("input")[3]?.value || "",
+      address: pickupSection.querySelectorAll("input")[4]?.value || "",
+      city: pickupSection.querySelectorAll("input")[5]?.value || "",
+      country: pickupSection.querySelectorAll("input")[6]?.value || "",
+      hours: pickupSection.querySelectorAll("input")[7]?.value || ""
     };
 
-    // 🔹 DELIVERY
+    // 🔹 5. DELIVERY
     const deliverySection = document.querySelector("#inlandFields > div:last-child");
 
     payload.delivery = {
-      company: deliverySection?.querySelectorAll("input")[0]?.value || "",
-      contact: deliverySection?.querySelectorAll("input")[1]?.value || "",
-      phone: deliverySection?.querySelectorAll("input")[2]?.value || "",
-      email: deliverySection?.querySelectorAll("input")[3]?.value || "",
-      address: deliverySection?.querySelectorAll("input")[4]?.value || "",
-      city: deliverySection?.querySelectorAll("input")[5]?.value || "",
-      country: deliverySection?.querySelectorAll("input")[6]?.value || "",
-      hours: deliverySection?.querySelectorAll("input")[7]?.value || ""
+      company: deliverySection.querySelectorAll("input")[0]?.value || "",
+      contact: deliverySection.querySelectorAll("input")[1]?.value || "",
+      phone: deliverySection.querySelectorAll("input")[2]?.value || "",
+      email: deliverySection.querySelectorAll("input")[3]?.value || "",
+      address: deliverySection.querySelectorAll("input")[4]?.value || "",
+      city: deliverySection.querySelectorAll("input")[5]?.value || "",
+      country: deliverySection.querySelectorAll("input")[6]?.value || "",
+      hours: deliverySection.querySelectorAll("input")[7]?.value || ""
     };
 
-    // 🔹 CARGO
+    // 🔹 6. CARGO
     payload.cargo = [];
 
     document.querySelectorAll(".cargo-item").forEach(item => {
 
       const qty = parseFloat(item.querySelector(".qty")?.value) || 0;
+
       let weight = parseFloat(item.querySelector(".weight")?.value) || 0;
       const weightUnit = item.querySelector(".weightUnit")?.value;
 
@@ -587,33 +741,108 @@ form.onsubmit = async (e) => {
       let H = parseFloat(item.querySelector(".height")?.value) || 0;
       const dimUnit = item.querySelector(".dimUnit")?.value;
 
+      // 🔹 FULL CONVERSIONS
       const weightKg = weightUnit === "lb" ? weight * 0.453592 : weight;
-      const cbm = (L * W * H) / 1000000;
+      const weightLb = weightUnit === "kg" ? weight * 2.20462 : weight;
 
-      if (!qty && !weight && !L && !W && !H) return;
+      const lengthCm = dimUnit === "in" ? L * 2.54 : L;
+      const widthCm  = dimUnit === "in" ? W * 2.54 : W;
+      const heightCm = dimUnit === "in" ? H * 2.54 : H;
+
+      const lengthIn = dimUnit === "cm" ? L / 2.54 : L;
+      const widthIn  = dimUnit === "cm" ? W / 2.54 : W;
+      const heightIn = dimUnit === "cm" ? H / 2.54 : H;
+
+      const cbm = (lengthCm * widthCm * heightCm) / 1000000;
+      const cft = cbm * 35.3147;
 
       payload.cargo.push({
+
+        commodity: item.querySelector(".commodity")?.value || "",
+        packagingType: item.querySelector(".packagingType")?.value || "",
+        cargoType: item.querySelector(".cargoType")?.value || "",
         qty,
-        weightKg,
-        cbm
+
+        weight: { value: weight, unit: weightUnit },
+
+        dimensions: {
+          length: { value: L, unit: dimUnit },
+          width:  { value: W, unit: dimUnit },
+          height: { value: H, unit: dimUnit }
+        },
+
+        normalized: {
+          weight: { value: weightKg, unit: "kg" },
+          dimensions: {
+            length: { value: lengthCm, unit: "cm" },
+            width:  { value: widthCm, unit: "cm" },
+            height: { value: heightCm, unit: "cm" }
+          }
+        },
+
+        volume: {
+          cbm: { value: cbm, unit: "m3" },
+          cft: { value: cft, unit: "ft3" }
+        },
+
+        converted: {
+          weight: {
+            kg: { value: weightKg, unit: "kg" },
+            lb: { value: weightLb, unit: "lb" }
+          },
+          dimensions: {
+            cm: {
+              length: { value: lengthCm, unit: "cm" },
+              width:  { value: widthCm, unit: "cm" },
+              height: { value: heightCm, unit: "cm" }
+            },
+            in: {
+              length: { value: lengthIn, unit: "in" },
+              width:  { value: widthIn, unit: "in" },
+              height: { value: heightIn, unit: "in" }
+            }
+          }
+        }
+
       });
 
     });
 
-    // ✅ FIXED VALIDATION (OUTSIDE LOOP)
-    if (!payload.email) {
-      alert("Email is required");
-      return;
-    }
+    // 🔹 7. TOTALS (AFTER cargo built)
+    let totalWeightKg = 0;
+    let totalVolumeCBM = 0;
 
-    if (payload.cargo.length === 0) {
-      alert("Please add at least one cargo item");
-      return;
-    }
+    payload.cargo.forEach(item => {
+      totalWeightKg += (item.normalized.weight.value * item.qty);
+      totalVolumeCBM += (item.volume.cbm.value * item.qty);
+    });
+
+    const volumetricWeightKg = totalVolumeCBM * 167;
+    const chargeableWeightKg = Math.max(totalWeightKg, volumetricWeightKg);
+
+    const totalWeightLb = totalWeightKg * 2.20462;
+    const totalVolumeFt3 = totalVolumeCBM * 35.3147;
+    const chargeableWeightLb = chargeableWeightKg * 2.20462;
+
+    payload.totals = {
+      weight: {
+        kg: { value: Number(totalWeightKg.toFixed(2)), unit: "kg" },
+        lb: { value: Number(totalWeightLb.toFixed(2)), unit: "lb" }
+      },
+      volume: {
+        cbm: { value: Number(totalVolumeCBM.toFixed(3)), unit: "m3" },
+        cft: { value: Number(totalVolumeFt3.toFixed(2)), unit: "ft3" }
+      },
+      chargeableWeight: {
+        kg: { value: Number(chargeableWeightKg.toFixed(2)), unit: "kg" },
+        lb: { value: Number(chargeableWeightLb.toFixed(2)), unit: "lb" }
+      }
+    };
 
     console.log("SENDING PAYLOAD:", payload);
 
-    await fetch("https://n8n-n10ai.onrender.com/webhook/new-design-pricing", {
+    // 🔹 8. SEND TO N8N
+    const res = await fetch("https://n8n-n10ai.onrender.com/webhook/new-design-pricing", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -621,30 +850,505 @@ form.onsubmit = async (e) => {
       body: JSON.stringify(payload)
     });
 
+    let result = {};
+    try {
+      result = await res.json();
+    } catch {
+      result = { success: true };
+    }
+
+    console.log("N8N RESPONSE:", result);
+
     alert("Quote submitted successfully: " + quoteNumber);
 
   } catch (err) {
-    console.error("SUBMIT ERROR:", err);
-    alert("Error submitting quote: " + err.message);
+    console.error(err);
+    alert("Error submitting quote");
   }
 };
-
-// ==========================
-// 🔧 FIXED INTRO
-// ==========================
-window.addEventListener("load", () => {
+// INTRO FIX
+document.addEventListener("DOMContentLoaded", () => {
   const intro = document.getElementById("introScreen");
 
   setTimeout(() => {
     intro.style.opacity = "0";
-
     setTimeout(() => {
       intro.style.display = "none";
     }, 600);
-
-  }, 1800);
+  }, 2000);
 });
 
+// SERVICE
+const modeEl = document.getElementById("mode");
+const serviceEl = document.getElementById("serviceType");
+
+const serviceWrap = document.getElementById("serviceWrap");
+const containerWrap = document.getElementById("containerWrap");
+
+
+const groundFields = document.getElementById("groundFields");
+
+function updateShipmentUI() {
+
+  const mode = modeEl.value;
+  const routeSection = document.getElementById("routeSection");
+
+  // ROUTE VISIBILITY
+  if (mode === "ground") {
+    routeSection.classList.add("hidden");
+  } else if (mode) {
+    routeSection.classList.remove("hidden");
+  } else {
+    routeSection.classList.add("hidden");
+  }
+
+  // RESET UI
+  serviceWrap.classList.add("hidden");
+  containerWrap.classList.add("hidden");
+  groundFields.classList.add("hidden");
+
+  serviceEl.innerHTML = '<option value="">Select service</option>';
+
+  // MODE LOGIC
+  if (mode === "air") {
+    serviceWrap.classList.remove("hidden");
+    serviceEl.innerHTML += `
+      <option value="airport">Airport to Airport</option>
+      <option value="door">Door to Door</option>
+    `;
+  }
+
+  if (mode === "ocean") {
+    serviceWrap.classList.remove("hidden");
+    serviceEl.innerHTML += `
+      <option value="lcl">LCL</option>
+      <option value="fcl">FCL</option>
+    `;
+  }
+
+  if (mode === "ground") {
+    groundFields.classList.remove("hidden");
+
+    serviceWrap.classList.remove("hidden");
+    serviceEl.innerHTML += `
+      <option value="ltl">LTL</option>
+      <option value="ftl">FTL</option>
+    `;
+  }
+
+  form.dispatchEvent(new Event("input"));
+}
+
+modeEl.addEventListener("change", updateShipmentUI);
+updateShipmentUI();
+
+  serviceEl.addEventListener("change", () => {
+
+  const mode = modeEl.value;
+  const service = serviceEl.value;
+
+  // ONLY SHOW FOR OCEAN + FCL
+  if (mode === "ocean" && service === "fcl") {
+    containerWrap.classList.remove("hidden");
+  } else {
+    containerWrap.classList.add("hidden");
+  }
+
+});
+
+//////////////////////////////////////////////////
+// ✅ AUTOCOMPLETE FIX — REPLACE YOUR OLD BLOCK WITH THIS
+//////////////////////////////////////////////////
+
+let locations = [];
+
+async function loadLocations() {
+  try {
+    const res = await fetch("/mip-tools/logistics-locations.json");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    locations = await res.json();
+
+    document.getElementById("debugBox").innerText =
+      "Loaded locations: " + locations.length;
+
+    attachAutocomplete("originSearch", "origin");
+    attachAutocomplete("destinationSearch", "destination");
+
+  } catch (err) {
+    console.error("JSON load error:", err);
+    document.getElementById("debugBox").innerText =
+      "ERROR loading JSON: " + err.message;
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadLocations();
+});
+
+  function getAllowedTypes() {
+  const mode = document.getElementById("mode").value;
+
+  if (mode === "air") return ["airport"];
+  if (mode === "ocean") return ["seaport", "port"];
+  return null; // ground = no filter
+}
+  
+function attachAutocomplete(inputId, type) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+
+  const dropdown = document.createElement("div");
+  dropdown.style.position = "fixed";
+  dropdown.style.zIndex = "99999";
+  dropdown.style.background = "#111";
+  dropdown.style.color = "#fff";
+  dropdown.style.border = "1px solid #444";
+  dropdown.style.borderRadius = "8px";
+  dropdown.style.display = "none";
+  dropdown.style.maxHeight = "220px";
+  dropdown.style.overflowY = "auto";
+  dropdown.style.boxShadow = "0 10px 30px rgba(0,0,0,0.35)";
+
+  document.body.appendChild(dropdown);
+
+  function positionDropdown() {
+    const rect = input.getBoundingClientRect();
+    dropdown.style.top = rect.bottom + "px";
+    dropdown.style.left = rect.left + "px";
+    dropdown.style.width = rect.width + "px";
+  }
+
+  function closeDropdown() {
+    dropdown.style.display = "none";
+  }
+
+  input.addEventListener("input", () => {
+    const query = input.value.trim().toLowerCase();
+
+    positionDropdown();
+    dropdown.innerHTML = "";
+
+    if (!query) {
+      closeDropdown();
+      return;
+    }
+
+const allowedTypes = getAllowedTypes();
+
+let results = locations.filter(loc => {
+
+  const matchesSearch =
+    (loc.search || "").toLowerCase().includes(query);
+
+  const matchesType =
+    !allowedTypes || allowedTypes.includes(loc.type);
+
+  return matchesSearch && matchesType;
+});
+
+    results = results.slice(0, 8);
+
+    if (results.length === 0) {
+      const empty = document.createElement("div");
+      empty.style.padding = "10px";
+      empty.style.opacity = "0.7";
+      empty.innerText = "No matches found";
+      dropdown.appendChild(empty);
+      dropdown.style.display = "block";
+      return;
+    }
+
+    results.forEach(loc => {
+      const item = document.createElement("div");
+      item.style.padding = "10px";
+      item.style.cursor = "pointer";
+      item.style.borderBottom = "1px solid rgba(255,255,255,0.06)";
+      item.innerText = `${loc.code} - ${loc.city}, ${loc.country}`;
+
+      item.addEventListener("mouseenter", () => {
+        item.style.background = "rgba(59,130,246,0.18)";
+      });
+
+      item.addEventListener("mouseleave", () => {
+        item.style.background = "transparent";
+      });
+
+      item.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+
+        input.value = `${loc.code} - ${loc.city}, ${loc.country}`;
+
+        if (type === "origin") {
+          document.getElementById("originCode").value = loc.code || "";
+          document.getElementById("originName").value = loc.name || "";
+          document.getElementById("originCountry").value = loc.country || "";
+        } else {
+          document.getElementById("destinationCode").value = loc.code || "";
+          document.getElementById("destinationName").value = loc.name || "";
+          document.getElementById("destinationCountry").value = loc.country || "";
+        }
+
+        dropdown.style.display = "none";
+
+        form.dispatchEvent(new Event("input", { bubbles: true }));
+      });
+
+      dropdown.appendChild(item);
+    });
+
+    dropdown.style.display = "block";
+  });
+
+  input.addEventListener("focus", () => {
+    if (input.value.trim()) {
+      input.dispatchEvent(new Event("input"));
+    }
+  });
+
+  input.addEventListener("blur", () => {
+    setTimeout(() => {
+      closeDropdown();
+    }, 150);
+  });
+
+  window.addEventListener("resize", positionDropdown);
+  window.addEventListener("scroll", positionDropdown, true);
+}
+
+
+//TOTAL CALCULATIONS  WEIGHT - VOLUME
+
+  function calculateTotals() {
+
+  const items = document.querySelectorAll(".cargo-item");
+
+  let totalWeight = 0;
+  let totalVolume = 0;
+
+  items.forEach(item => {
+
+    const qty = parseFloat(item.querySelector(".qty")?.value) || 0;
+    const weight = parseFloat(item.querySelector(".weight")?.value) || 0;
+    const weightUnit = item.querySelector(".weightUnit")?.value;
+
+    const L = parseFloat(item.querySelector(".length")?.value) || 0;
+    const W = parseFloat(item.querySelector(".width")?.value) || 0;
+    const H = parseFloat(item.querySelector(".height")?.value) || 0;
+    const dimUnit = item.querySelector(".dimUnit")?.value;
+
+    // 🔹 Convert weight to KG
+    let weightKg = weight;
+    if (weightUnit === "lb") weightKg = weight * 0.453592;
+
+    // 🔹 Volume calculation
+    let volumeCBM = 0;
+
+    if (dimUnit === "cm") {
+      volumeCBM = (L * W * H) / 1000000;
+    }
+
+    if (dimUnit === "in") {
+      volumeCBM = (L * W * H) / 1728 * 0.0283168;
+    }
+
+    totalWeight += weightKg * qty;
+    totalVolume += volumeCBM * qty;
+
+  });
+
+  // ✈ Air logic
+  const volumetricWeight = totalVolume * 167;
+  const chargeableWeight = Math.max(totalWeight, volumetricWeight);
+
+  // UI update
+  document.getElementById("totals").innerHTML = `
+    <div class="glass p-3 rounded-xl space-y-1">
+
+      <div>Total Gross Weight: <b>${totalWeight.toFixed(2)} kg</b></div>
+      <div>Total Volume: <b>${totalVolume.toFixed(3)} CBM</b></div>
+
+<div class="${volumetricWeight > totalWeight ? 'text-yellow-400' : ''}">
+  Volumetric Weight: <b>${volumetricWeight.toFixed(2)} kg</b>
+</div>
+
+<div class="text-blue-300">
+  Chargeable Weight: <b>${chargeableWeight.toFixed(2)} kg</b>
+</div>
+
+    </div>
+  `;
+}
+document.addEventListener("input", (e) => {
+  if (e.target.closest(".cargo-item")) {
+    calculateTotals();
+  }
+});
+
+function clearCargoItems() {
+  document.getElementById("cargoItems").innerHTML = "";
+  calculateTotals();
+}
+
+
+
+
+function fillFormFromAI(data) {
+
+  // 🔹 MODE
+  if (data.mode) {
+    document.getElementById("mode").value = data.mode;
+    updateShipmentUI();
+  }
+
+  // 🔹 ORIGIN / DESTINATION
+  if (data.origin) {
+    document.getElementById("originSearch").value = data.origin;
+  }
+
+  if (data.destination) {
+    document.getElementById("destinationSearch").value = data.destination;
+  }
+
+  // 🔹 CARGO
+  if (data.cargo && Array.isArray(data.cargo)) {
+
+    clearCargoItems();
+
+    data.cargo.forEach(item => {
+      addCargoItemFromData(item);
+    });
+
+    updateCargoNumbers();
+    calculateTotals();
+  }
+
+}
+
+function addCargoItemFromData(itemData = {}) {
+
+  const div = document.createElement("div");
+  const index = document.querySelectorAll(".cargo-item").length + 1;
+
+  div.innerHTML = `
+  <div class="glass p-4 rounded-xl mb-3 relative cargo-item">
+
+    <button type="button"
+      class="absolute top-2 right-2 text-xs bg-red-500/20 hover:bg-red-500/40 px-2 py-1 rounded text-red-300"
+      onclick="this.closest('.cargo-item').remove(); updateCargoNumbers(); calculateTotals();">
+      ✕
+    </button>
+
+    <div class="text-sm mb-2 text-blue-300 font-semibold cargo-title">
+      Item #${index}
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3">
+
+      <select class="input p-2 rounded cargoType">
+        <option value="">Cargo Type</option>
+        <option value="general">General Cargo</option>
+        <option value="dg">Dangerous Goods</option>
+      </select>
+
+      <select class="input p-2 rounded packagingType">
+        <option value="">Packaging</option>
+        <option value="pallet">Pallet</option>
+        <option value="box">Box</option>
+        <option value="crate">Crate</option>
+      </select>
+
+      <input class="input p-2 rounded commodity" placeholder="Commodity">
+
+    </div>
+
+    <div class="grid grid-cols-4 gap-2">
+
+      <input class="input p-2 rounded qty" placeholder="Qty" value="${itemData.qty || ""}">
+
+      <input class="input p-2 rounded weight" placeholder="Weight" value="${itemData.weight || ""}">
+
+      <select class="input p-2 rounded weightUnit">
+        <option value="kg" ${itemData.weightUnit === "kg" ? "selected" : ""}>kg</option>
+        <option value="lb" ${itemData.weightUnit === "lb" ? "selected" : ""}>lb</option>
+      </select>
+
+      <input class="input p-2 rounded length" placeholder="L" value="${itemData.length || ""}">
+      <input class="input p-2 rounded width" placeholder="W" value="${itemData.width || ""}">
+      <input class="input p-2 rounded height" placeholder="H" value="${itemData.height || ""}">
+
+      <select class="input p-2 rounded dimUnit">
+        <option value="cm" ${itemData.dimUnit === "cm" ? "selected" : ""}>cm</option>
+        <option value="in" ${itemData.dimUnit === "in" ? "selected" : ""}>in</option>
+      </select>
+
+    </div>
+
+  </div>
+  `;
+
+  document.getElementById("cargoItems").appendChild(div);
+}
+
+
+  runAiParse.onclick = async () => {
+
+  const text = aiInput.value.trim();
+
+  if (!text) {
+    aiStatus.innerText = "Please paste shipment details first.";
+    return;
+  }
+
+  aiStatus.innerText = "Parsing...";
+
+  try {
+
+    const res = await fetch("https://n8n-n10ai.onrender.com/webhook/ai parser 2", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        text: text
+      })
+    });
+
+    const data = await res.json();
+
+    console.log("AI RESPONSE:", data);
+
+    fillFormFromAI(data);
+
+    aiStatus.innerText = "✅ Parsed successfully";
+    closeAiParserModal();
+
+  } catch (err) {
+    console.error(err);
+    aiStatus.innerText = "❌ Error parsing shipment";
+  }
+
+};
+
+//GENERATE QUOTE # 
+function generateQuoteNumber() {
+  const now = new Date();
+
+  const datePart =
+    now.getFullYear().toString() +
+    String(now.getMonth() + 1).padStart(2, "0") +
+    String(now.getDate()).padStart(2, "0");
+
+  const timePart =
+    String(now.getHours()).padStart(2, "0") +
+    String(now.getMinutes()).padStart(2, "0") +
+    String(now.getSeconds()).padStart(2, "0");
+
+  const randomPart = Math.floor(1000 + Math.random() * 9000);
+
+  return `MIP-${datePart}-${timePart}-${randomPart}`;
+}
+  
 </script>
 
 </body>
