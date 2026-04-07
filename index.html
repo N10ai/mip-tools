@@ -339,6 +339,9 @@ No back-and-forth. No delays.
       <input name="originZip" class="input p-3 rounded-lg" placeholder="Origin ZIP">
       <input name="destinationZip" class="input p-3 rounded-lg" placeholder="Destination ZIP">
 
+<input type="hidden" name="originCountryGround" id="originCountryGround">
+<input type="hidden" name="destinationCountryGround" id="destinationCountryGround">
+      
     </div>
 
   </div>
@@ -855,6 +858,53 @@ payload.totals = {
   }
 };
 
+// 🔹 DIRECTION LOGIC
+
+function getDirection(payload) {
+
+  let originCountry = "";
+  let destinationCountry = "";
+
+// 🚚 GROUND = domestic (for now)
+  if (payload.mode === "ground") {
+    return "Domestic";
+  }
+  
+  // AIR / OCEAN
+  if (payload.originCountry && payload.destinationCountry) {
+    originCountry = payload.originCountry.toUpperCase();
+    destinationCountry = payload.destinationCountry.toUpperCase();
+  }
+
+  // GROUND (fallback)
+  if (!originCountry && payload.originCountry) {
+    originCountry = payload.originCountry.toUpperCase();
+  }
+
+  if (!destinationCountry && payload.destinationCountry) {
+    destinationCountry = payload.destinationCountry.toUpperCase();
+  }
+
+  // FINAL LOGIC
+  if (originCountry === "USA" && destinationCountry === "USA") {
+    return "Domestic";
+  }
+
+  if (originCountry !== "USA" && destinationCountry === "USA") {
+    return "Import";
+  }
+
+  if (originCountry === "USA" && destinationCountry !== "USA") {
+    return "Export";
+  }
+
+  return "International"; // optional fallback
+}
+
+// SET FIELD
+payload.direction = getDirection(payload);
+    
+    
     // ✅ DEBUG BEFORE SEND
     console.log("🚀 PAYLOAD:", payload);
     debugBox.innerText = "Sending...";
