@@ -679,13 +679,21 @@ document.getElementById("includeInland").onchange=e=>{
 form.onsubmit = async (e) => {
   e.preventDefault();
 
+  const debugBox = document.getElementById("debugBox");
+
   try {
 
-    // 🔹 1. Generate Quote Number
+    // ✅ VALIDATION
+    if (!form.reportValidity()) {
+      debugBox.innerText = "❌ Please fill required fields";
+      return;
+    }
+
+    // ✅ QUOTE NUMBER
     const quoteNumber = generateQuoteNumber();
     document.getElementById("quoteNumber").value = quoteNumber;
 
-    // 🔹 2. Base form data
+    // ✅ BASE DATA
     const data = new FormData(form);
     const payload = {};
 
@@ -693,155 +701,165 @@ form.onsubmit = async (e) => {
       payload[key] = value;
     });
 
-    // 🔹 3. Booleans
+    // ✅ FLAGS
     payload.isFTZ = document.getElementById("isFTZ").checked;
     payload.isBonded = document.getElementById("isBonded").checked;
     payload.includeInland = document.getElementById("includeInland").checked;
 
-    // 🔹 4. PICKUP
-    const pickupSection = document.querySelector("#inlandFields > div:first-child");
+    // ✅ PICKUP / DELIVERY (SAFE)
+    const sections = document.querySelectorAll("#inlandFields > div");
 
-    payload.pickup = {
-      company: pickupSection.querySelectorAll("input")[0]?.value || "",
-      contact: pickupSection.querySelectorAll("input")[1]?.value || "",
-      phone: pickupSection.querySelectorAll("input")[2]?.value || "",
-      email: pickupSection.querySelectorAll("input")[3]?.value || "",
-      address: pickupSection.querySelectorAll("input")[4]?.value || "",
-      city: pickupSection.querySelectorAll("input")[5]?.value || "",
-      country: pickupSection.querySelectorAll("input")[6]?.value || "",
-      hours: pickupSection.querySelectorAll("input")[7]?.value || ""
-    };
+    payload.pickup = {};
+    payload.delivery = {};
 
-    // 🔹 5. DELIVERY
-    const deliverySection = document.querySelector("#inlandFields > div:last-child");
+    if (sections[0]) {
+      const inputs = sections[0].querySelectorAll("input");
+      payload.pickup = {
+        company: inputs[0]?.value || "",
+        contact: inputs[1]?.value || "",
+        phone: inputs[2]?.value || "",
+        email: inputs[3]?.value || "",
+        address: inputs[4]?.value || "",
+        city: inputs[5]?.value || "",
+        country: inputs[6]?.value || "",
+        hours: inputs[7]?.value || ""
+      };
+    }
 
-    payload.delivery = {
-      company: deliverySection.querySelectorAll("input")[0]?.value || "",
-      contact: deliverySection.querySelectorAll("input")[1]?.value || "",
-      phone: deliverySection.querySelectorAll("input")[2]?.value || "",
-      email: deliverySection.querySelectorAll("input")[3]?.value || "",
-      address: deliverySection.querySelectorAll("input")[4]?.value || "",
-      city: deliverySection.querySelectorAll("input")[5]?.value || "",
-      country: deliverySection.querySelectorAll("input")[6]?.value || "",
-      hours: deliverySection.querySelectorAll("input")[7]?.value || ""
-    };
+    if (sections[1]) {
+      const inputs = sections[1].querySelectorAll("input");
+      payload.delivery = {
+        company: inputs[0]?.value || "",
+        contact: inputs[1]?.value || "",
+        phone: inputs[2]?.value || "",
+        email: inputs[3]?.value || "",
+        address: inputs[4]?.value || "",
+        city: inputs[5]?.value || "",
+        country: inputs[6]?.value || "",
+        hours: inputs[7]?.value || ""
+      };
+    }
 
-    // 🔹 6. CARGO
-    payload.cargo = [];
+   // 🔹 CARGO + TOTALS
+payload.cargo = [];
 
-    document.querySelectorAll(".cargo-item").forEach(item => {
+let totalWeightKg = 0;
+let totalVolumeCBM = 0;
 
-      const qty = parseFloat(item.querySelector(".qty")?.value) || 0;
+document.querySelectorAll(".cargo-item").forEach(item => {
 
-      let weight = parseFloat(item.querySelector(".weight")?.value) || 0;
-      const weightUnit = item.querySelector(".weightUnit")?.value;
+  const qty = parseFloat(item.querySelector(".qty")?.value) || 0;
 
-      let L = parseFloat(item.querySelector(".length")?.value) || 0;
-      let W = parseFloat(item.querySelector(".width")?.value) || 0;
-      let H = parseFloat(item.querySelector(".height")?.value) || 0;
-      const dimUnit = item.querySelector(".dimUnit")?.value;
+  let weight = parseFloat(item.querySelector(".weight")?.value) || 0;
+  const weightUnit = item.querySelector(".weightUnit")?.value;
 
-      // 🔹 FULL CONVERSIONS
-      const weightKg = weightUnit === "lb" ? weight * 0.453592 : weight;
-      const weightLb = weightUnit === "kg" ? weight * 2.20462 : weight;
+  let L = parseFloat(item.querySelector(".length")?.value) || 0;
+  let W = parseFloat(item.querySelector(".width")?.value) || 0;
+  let H = parseFloat(item.querySelector(".height")?.value) || 0;
+  const dimUnit = item.querySelector(".dimUnit")?.value;
 
-      const lengthCm = dimUnit === "in" ? L * 2.54 : L;
-      const widthCm  = dimUnit === "in" ? W * 2.54 : W;
-      const heightCm = dimUnit === "in" ? H * 2.54 : H;
+  // ✅ NORMALIZE WEIGHT
+  const weightKg = weightUnit === "lb" ? weight * 0.453592 : weight;
+  const weightLb = weightUnit === "kg" ? weight * 2.20462 : weight;
 
-      const lengthIn = dimUnit === "cm" ? L / 2.54 : L;
-      const widthIn  = dimUnit === "cm" ? W / 2.54 : W;
-      const heightIn = dimUnit === "cm" ? H / 2.54 : H;
+  // ✅ NORMALIZE DIMENSIONS
+  const lengthCm = dimUnit === "in" ? L * 2.54 : L;
+  const widthCm  = dimUnit === "in" ? W * 2.54 : W;
+  const heightCm = dimUnit === "in" ? H * 2.54 : H;
 
-      const cbm = (lengthCm * widthCm * heightCm) / 1000000;
-      const cft = cbm * 35.3147;
+  const lengthIn = dimUnit === "cm" ? L / 2.54 : L;
+  const widthIn  = dimUnit === "cm" ? W / 2.54 : W;
+  const heightIn = dimUnit === "cm" ? H / 2.54 : H;
 
-      payload.cargo.push({
+  // ✅ VOLUME
+  const cbm = (lengthCm * widthCm * heightCm) / 1000000;
+  const cft = cbm * 35.3147;
 
-        commodity: item.querySelector(".commodity")?.value || "",
-        packagingType: item.querySelector(".packagingType")?.value || "",
-        cargoType: item.querySelector(".cargoType")?.value || "",
-        qty,
+  // ✅ ACCUMULATE TOTALS
+  totalWeightKg += weightKg * qty;
+  totalVolumeCBM += cbm * qty;
 
-        weight: { value: weight, unit: weightUnit },
+  // ✅ PUSH ITEM
+  payload.cargo.push({
 
-        dimensions: {
-          length: { value: L, unit: dimUnit },
-          width:  { value: W, unit: dimUnit },
-          height: { value: H, unit: dimUnit }
-        },
+    commodity: item.querySelector(".commodity")?.value || "",
+    packagingType: item.querySelector(".packagingType")?.value || "",
+    cargoType: item.querySelector(".cargoType")?.value || "",
+    qty,
 
-        normalized: {
-          weight: { value: weightKg, unit: "kg" },
-          dimensions: {
-            length: { value: lengthCm, unit: "cm" },
-            width:  { value: widthCm, unit: "cm" },
-            height: { value: heightCm, unit: "cm" }
-          }
-        },
+    weight: { value: weight, unit: weightUnit },
 
-        volume: {
-          cbm: { value: cbm, unit: "m3" },
-          cft: { value: cft, unit: "ft3" }
-        },
+    dimensions: {
+      length: { value: L, unit: dimUnit },
+      width:  { value: W, unit: dimUnit },
+      height: { value: H, unit: dimUnit }
+    },
 
-        converted: {
-          weight: {
-            kg: { value: weightKg, unit: "kg" },
-            lb: { value: weightLb, unit: "lb" }
-          },
-          dimensions: {
-            cm: {
-              length: { value: lengthCm, unit: "cm" },
-              width:  { value: widthCm, unit: "cm" },
-              height: { value: heightCm, unit: "cm" }
-            },
-            in: {
-              length: { value: lengthIn, unit: "in" },
-              width:  { value: widthIn, unit: "in" },
-              height: { value: heightIn, unit: "in" }
-            }
-          }
-        }
-
-      });
-
-    });
-
-    // 🔹 7. TOTALS (AFTER cargo built)
-    let totalWeightKg = 0;
-    let totalVolumeCBM = 0;
-
-    payload.cargo.forEach(item => {
-      totalWeightKg += (item.normalized.weight.value * item.qty);
-      totalVolumeCBM += (item.volume.cbm.value * item.qty);
-    });
-
-    const volumetricWeightKg = totalVolumeCBM * 167;
-    const chargeableWeightKg = Math.max(totalWeightKg, volumetricWeightKg);
-
-    const totalWeightLb = totalWeightKg * 2.20462;
-    const totalVolumeFt3 = totalVolumeCBM * 35.3147;
-    const chargeableWeightLb = chargeableWeightKg * 2.20462;
-
-    payload.totals = {
-      weight: {
-        kg: { value: Number(totalWeightKg.toFixed(2)), unit: "kg" },
-        lb: { value: Number(totalWeightLb.toFixed(2)), unit: "lb" }
-      },
-      volume: {
-        cbm: { value: Number(totalVolumeCBM.toFixed(3)), unit: "m3" },
-        cft: { value: Number(totalVolumeFt3.toFixed(2)), unit: "ft3" }
-      },
-      chargeableWeight: {
-        kg: { value: Number(chargeableWeightKg.toFixed(2)), unit: "kg" },
-        lb: { value: Number(chargeableWeightLb.toFixed(2)), unit: "lb" }
+    normalized: {
+      weight: { value: weightKg, unit: "kg" },
+      dimensions: {
+        length: { value: lengthCm, unit: "cm" },
+        width:  { value: widthCm, unit: "cm" },
+        height: { value: heightCm, unit: "cm" }
       }
-    };
+    },
 
-    console.log("SENDING PAYLOAD:", payload);
+    volume: {
+      cbm: { value: cbm, unit: "m3" },
+      cft: { value: cft, unit: "ft3" }
+    },
 
-    // 🔹 8. SEND TO N8N
+    converted: {
+      weight: {
+        kg: { value: weightKg, unit: "kg" },
+        lb: { value: weightLb, unit: "lb" }
+      },
+      dimensions: {
+        cm: {
+          length: { value: lengthCm, unit: "cm" },
+          width:  { value: widthCm, unit: "cm" },
+          height: { value: heightCm, unit: "cm" }
+        },
+        in: {
+          length: { value: lengthIn, unit: "in" },
+          width:  { value: widthIn, unit: "in" },
+          height: { value: heightIn, unit: "in" }
+        }
+      }
+    }
+
+  });
+
+});
+
+// 🔹 FINAL TOTALS
+const volumetricWeightKg = totalVolumeCBM * 167;
+const chargeableWeightKg = Math.max(totalWeightKg, volumetricWeightKg);
+
+const totalWeightLb = totalWeightKg * 2.20462;
+const totalVolumeFt3 = totalVolumeCBM * 35.3147;
+const chargeableWeightLb = chargeableWeightKg * 2.20462;
+
+payload.totals = {
+  weight: {
+    kg: { value: Number(totalWeightKg.toFixed(2)), unit: "kg" },
+    lb: { value: Number(totalWeightLb.toFixed(2)), unit: "lb" }
+  },
+  volume: {
+    cbm: { value: Number(totalVolumeCBM.toFixed(3)), unit: "m3" },
+    cft: { value: Number(totalVolumeFt3.toFixed(2)), unit: "ft3" }
+  },
+  chargeableWeight: {
+    kg: { value: Number(chargeableWeightKg.toFixed(2)), unit: "kg" },
+    lb: { value: Number(chargeableWeightLb.toFixed(2)), unit: "lb" }
+  }
+};
+
+    // ✅ DEBUG BEFORE SEND
+    console.log("🚀 PAYLOAD:", payload);
+    debugBox.innerText = "Sending...";
+
+    // ✅ SEND
     const res = await fetch("https://n8n-n10ai.onrender.com/webhook/new-design-pricing", {
       method: "POST",
       headers: {
@@ -850,22 +868,27 @@ form.onsubmit = async (e) => {
       body: JSON.stringify(payload)
     });
 
-    let result = {};
-    try {
-      result = await res.json();
-    } catch {
-      result = { success: true };
+    // ✅ CHECK RESPONSE
+    if (!res.ok) {
+      throw new Error(`HTTP ERROR ${res.status}`);
     }
 
-    console.log("N8N RESPONSE:", result);
+    const text = await res.text();
 
-    alert("Quote submitted successfully: " + quoteNumber);
+    console.log("✅ RESPONSE:", text);
+
+    debugBox.innerText = "✅ Sent successfully";
+    alert("Quote submitted: " + quoteNumber);
 
   } catch (err) {
-    console.error(err);
+    console.error("❌ ERROR:", err);
+    debugBox.innerText = "❌ " + err.message;
     alert("Error submitting quote");
   }
 };
+
+
+  
 // INTRO FIX
 document.addEventListener("DOMContentLoaded", () => {
   const intro = document.getElementById("introScreen");
