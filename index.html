@@ -387,30 +387,54 @@ Cargo Details
 
 <div id="inlandFields" class="hidden mt-4 space-y-4">
 
+  <!-- PICKUP -->
   <div class="glass p-4 rounded-xl">
     <div class="text-sm text-blue-300 mb-2">Pickup</div>
 
-    <input class="input p-2 mb-2 w-full" placeholder="Company Name">
-    <input class="input p-2 mb-2 w-full" placeholder="Contact Name">
-    <input class="input p-2 mb-2 w-full" placeholder="Phone">
-    <input class="input p-2 mb-2 w-full" placeholder="Email">
-    <input class="input p-2 mb-2 w-full" placeholder="Address">
-    <input class="input p-2 mb-2 w-full" placeholder="City">
-    <input class="input p-2 mb-2 w-full" placeholder="Country">
-    <input class="input p-2 w-full" placeholder="Hours (e.g. 8am - 5pm)">
+    <!-- CONTACT INFO (VISIBLE) -->
+    <input id="pickupCompany" class="input p-2 mb-2 w-full" placeholder="Company Name">
+    <input id="pickupContact" class="input p-2 mb-2 w-full" placeholder="Contact Name">
+    <input id="pickupPhone" class="input p-2 mb-2 w-full" placeholder="Phone">
+    <input id="pickupEmail" class="input p-2 mb-3 w-full" placeholder="Email">
+
+    <!-- ADDRESS (SMART FIELD) -->
+    <input id="pickupSearch" class="input p-3 w-full rounded-lg mb-2"
+      placeholder="Search full address (street, city, state, zip)">
+
+    <!-- STRUCTURED (HIDDEN FOR WEBHOOK) -->
+    <input type="hidden" id="pickupAddress">
+    <input type="hidden" id="pickupCity">
+    <input type="hidden" id="pickupState">
+    <input type="hidden" id="pickupZip">
+    <input type="hidden" id="pickupCountry" value="USA">
+
+    <input id="pickupHours" class="input p-2 w-full mt-2"
+      placeholder="Hours (e.g. 8am - 5pm)">
   </div>
 
+  <!-- DELIVERY -->
   <div class="glass p-4 rounded-xl">
     <div class="text-sm text-blue-300 mb-2">Delivery</div>
 
-    <input class="input p-2 mb-2 w-full" placeholder="Company Name">
-    <input class="input p-2 mb-2 w-full" placeholder="Contact Name">
-    <input class="input p-2 mb-2 w-full" placeholder="Phone">
-    <input class="input p-2 mb-2 w-full" placeholder="Email">
-    <input class="input p-2 mb-2 w-full" placeholder="Address">
-    <input class="input p-2 mb-2 w-full" placeholder="City">
-    <input class="input p-2 mb-2 w-full" placeholder="Country">
-    <input class="input p-2 w-full" placeholder="Hours">
+    <!-- CONTACT INFO (VISIBLE) -->
+    <input id="deliveryCompany" class="input p-2 mb-2 w-full" placeholder="Company Name">
+    <input id="deliveryContact" class="input p-2 mb-2 w-full" placeholder="Contact Name">
+    <input id="deliveryPhone" class="input p-2 mb-2 w-full" placeholder="Phone">
+    <input id="deliveryEmail" class="input p-2 mb-3 w-full" placeholder="Email">
+
+    <!-- ADDRESS (SMART FIELD) -->
+    <input id="deliverySearch" class="input p-3 w-full rounded-lg mb-2"
+      placeholder="Search full address (street, city, state, zip)">
+
+    <!-- STRUCTURED (HIDDEN FOR WEBHOOK) -->
+    <input type="hidden" id="deliveryAddress">
+    <input type="hidden" id="deliveryCity">
+    <input type="hidden" id="deliveryState">
+    <input type="hidden" id="deliveryZip">
+    <input type="hidden" id="deliveryCountry" value="USA">
+
+    <input id="deliveryHours" class="input p-2 w-full mt-2"
+      placeholder="Hours">
   </div>
 
 </div>
@@ -717,30 +741,34 @@ form.onsubmit = async (e) => {
 
     if (sections[0]) {
       const inputs = sections[0].querySelectorAll("input");
-      payload.pickup = {
-        company: inputs[0]?.value || "",
-        contact: inputs[1]?.value || "",
-        phone: inputs[2]?.value || "",
-        email: inputs[3]?.value || "",
-        address: inputs[4]?.value || "",
-        city: inputs[5]?.value || "",
-        country: inputs[6]?.value || "",
-        hours: inputs[7]?.value || ""
-      };
+payload.pickup = {
+  company: document.getElementById("pickupCompany").value || "",
+  contact: document.getElementById("pickupContact").value || "",
+  phone: document.getElementById("pickupPhone").value || "",
+  email: document.getElementById("pickupEmail").value || "",
+  address: document.getElementById("pickupAddress").value || "",
+  city: document.getElementById("pickupCity").value || "",
+  state: document.getElementById("pickupState").value || "",
+  zip: document.getElementById("pickupZip").value || "",
+  country: "USA",
+  hours: document.getElementById("pickupHours").value || ""
+};
     }
 
     if (sections[1]) {
       const inputs = sections[1].querySelectorAll("input");
-      payload.delivery = {
-        company: inputs[0]?.value || "",
-        contact: inputs[1]?.value || "",
-        phone: inputs[2]?.value || "",
-        email: inputs[3]?.value || "",
-        address: inputs[4]?.value || "",
-        city: inputs[5]?.value || "",
-        country: inputs[6]?.value || "",
-        hours: inputs[7]?.value || ""
-      };
+     payload.delivery = {
+  company: document.getElementById("deliveryCompany").value || "",
+  contact: document.getElementById("deliveryContact").value || "",
+  phone: document.getElementById("deliveryPhone").value || "",
+  email: document.getElementById("deliveryEmail").value || "",
+  address: document.getElementById("deliveryAddress").value || "",
+  city: document.getElementById("deliveryCity").value || "",
+  state: document.getElementById("deliveryState").value || "",
+  zip: document.getElementById("deliveryZip").value || "",
+  country: "USA",
+  hours: document.getElementById("deliveryHours").value || ""
+};
     }
 
    // 🔹 CARGO + TOTALS
