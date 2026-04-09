@@ -1449,6 +1449,140 @@ function generateQuoteNumber() {
 
   return `MIP-${datePart}-${timePart}-${randomPart}`;
 }
+
+/// Autofill Address for inland 
+
+  // 🌍 OPENSTREETMAP AUTOCOMPLETE
+
+function initOSMAutocomplete(inputId, prefix) {
+
+  const input = document.getElementById(inputId);
+
+  const dropdown = document.createElement("div");
+  dropdown.style.position = "fixed";
+  dropdown.style.zIndex = "99999";
+  dropdown.style.background = "#111";
+  dropdown.style.color = "#fff";
+  dropdown.style.border = "1px solid #444";
+  dropdown.style.borderRadius = "8px";
+  dropdown.style.display = "none";
+  dropdown.style.maxHeight = "220px";
+  dropdown.style.overflowY = "auto";
+  dropdown.style.boxShadow = "0 10px 30px rgba(0,0,0,0.4)";
+
+  document.body.appendChild(dropdown);
+
+  function positionDropdown() {
+    const rect = input.getBoundingClientRect();
+    dropdown.style.top = rect.bottom + "px";
+    dropdown.style.left = rect.left + "px";
+    dropdown.style.width = rect.width + "px";
+  }
+
+  function closeDropdown() {
+    dropdown.style.display = "none";
+  }
+
+  let debounceTimer;
+
+  input.addEventListener("input", () => {
+
+    clearTimeout(debounceTimer);
+
+    const query = input.value.trim();
+
+    if (query.length < 3) {
+      closeDropdown();
+      return;
+    }
+
+    debounceTimer = setTimeout(async () => {
+
+      try {
+
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&countrycodes=us&q=${encodeURIComponent(query)}`
+        );
+
+        const results = await res.json();
+
+        dropdown.innerHTML = "";
+        positionDropdown();
+
+        if (!results.length) {
+          dropdown.style.display = "none";
+          return;
+        }
+
+        results.forEach(place => {
+
+          const item = document.createElement("div");
+          item.style.padding = "10px";
+          item.style.cursor = "pointer";
+          item.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
+          item.innerText = place.display_name;
+
+          item.addEventListener("mouseenter", () => {
+            item.style.background = "rgba(59,130,246,0.2)";
+          });
+
+          item.addEventListener("mouseleave", () => {
+            item.style.background = "transparent";
+          });
+
+          item.addEventListener("mousedown", (e) => {
+            e.preventDefault();
+
+            input.value = place.display_name;
+
+            const addr = place.address;
+
+            document.getElementById(prefix + "Address").value =
+              (addr.house_number || "") + " " + (addr.road || "");
+
+            document.getElementById(prefix + "City").value =
+              addr.city || addr.town || addr.village || "";
+
+            document.getElementById(prefix + "State").value =
+              addr.state || "";
+
+            document.getElementById(prefix + "Zip").value =
+              addr.postcode || "";
+
+            document.getElementById(prefix + "Country").value = "USA";
+
+            dropdown.style.display = "none";
+
+          });
+
+          dropdown.appendChild(item);
+
+        });
+
+        dropdown.style.display = "block";
+
+      } catch (err) {
+        console.error("OSM error:", err);
+      }
+
+    }, 300);
+
+  });
+
+  input.addEventListener("blur", () => {
+    setTimeout(closeDropdown, 150);
+  });
+
+  window.addEventListener("resize", positionDropdown);
+  window.addEventListener("scroll", positionDropdown, true);
+}
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  initOSMAutocomplete("pickupSearch", "pickup");
+  initOSMAutocomplete("deliverySearch", "delivery");
+});
+
   
 </script>
 
