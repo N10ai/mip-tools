@@ -893,40 +893,36 @@ function getDirection(payload) {
   let originCountry = "";
   let destinationCountry = "";
 
-// 🚚 GROUND = domestic (for now)
-  if (payload.mode === "ground") {
-    return "Domestic";
-  }
-  
-  // AIR / OCEAN
+  // 🌍 PRIORITY: AIR / OCEAN (your autocomplete)
   if (payload.originCountry && payload.destinationCountry) {
     originCountry = payload.originCountry.toUpperCase();
     destinationCountry = payload.destinationCountry.toUpperCase();
   }
 
-  // GROUND (fallback)
-  if (!originCountry && payload.originCountry) {
-    originCountry = payload.originCountry.toUpperCase();
+  // 🚚 FALLBACK: GROUND (you must set USA)
+  if (payload.mode === "ground") {
+    originCountry = (payload.originCountryGround || "USA").toUpperCase();
+    destinationCountry = (payload.destinationCountryGround || "USA").toUpperCase();
   }
 
-  if (!destinationCountry && payload.destinationCountry) {
-    destinationCountry = payload.destinationCountry.toUpperCase();
-  }
+  // 🧠 SAFETY FALLBACK
+  if (!originCountry) originCountry = "USA";
+  if (!destinationCountry) destinationCountry = "USA";
 
-  // FINAL LOGIC
+  // 🎯 FINAL LOGIC
   if (originCountry === "USA" && destinationCountry === "USA") {
     return "Domestic";
-  }
-
-  if (originCountry !== "USA" && destinationCountry === "USA") {
-    return "Import";
   }
 
   if (originCountry === "USA" && destinationCountry !== "USA") {
     return "Export";
   }
 
-  return "International"; // optional fallback
+  if (originCountry !== "USA" && destinationCountry === "USA") {
+    return "Import";
+  }
+
+  return "International";
 }
 
 // SET FIELD
@@ -1029,7 +1025,10 @@ function updateShipmentUI() {
 
   if (mode === "ground") {
     groundFields.classList.remove("hidden");
-
+    
+document.getElementById("originCountryGround").value = "USA";
+  document.getElementById("destinationCountryGround").value = "USA";
+    
     serviceWrap.classList.remove("hidden");
     serviceEl.innerHTML += `
       <option value="ltl">LTL</option>
